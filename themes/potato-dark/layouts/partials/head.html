@@ -1,6 +1,6 @@
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   {{ with .Title | default .Site.Title }}
   <title>{{ . }}</title>
   <meta property="og:title" content="{{ . }}" />
@@ -38,7 +38,6 @@
   {{ end }}
   <!-- Hugo Version number -->
   {{ hugo.Generator -}}
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600" rel="stylesheet">
   <link rel="stylesheet" href="{{ .Site.BaseURL }}/css/style.css" />
   {{- with .Site.Params.favicon }}
   <link rel='icon' type='image/x-icon' href="{{ . | absURL }}" />
@@ -48,5 +47,4 @@
   <link href="{{ .Permalink }}" rel="alternate" type="application/rss+xml" title="{{ $.Site.Title }}" />
   {{ end }}
   {{ end }}
-  <script type="text/javascript" src="{{ .Site.BaseURL }}/js/bundle.js"></script>
 </head>

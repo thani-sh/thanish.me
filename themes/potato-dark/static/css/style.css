@@ -55,7 +55,6 @@ h5,
 h6 {
     color: #ccc;
     font-weight: 300;
-    font-family: Open Sans, sans-serif
 }
 
 h1 {
@@ -189,7 +188,6 @@ img {
 
 .c-title {
     font-weight: 300;
-    font-family: Open Sans, sans-serif
 }
 
 .c-links {
@@ -402,7 +400,6 @@ img {
     margin: 0px 0 0;
     font-size: 2rem;
     font-weight: 300;
-    font-family: Open Sans, sans-serif
 }
 
 .p-tag-title {
@@ -693,7 +690,6 @@ img {
     background-color: #92c6f2;
     color: #fafafa;
     font-weight: 400;
-    font-family: Open Sans, sans-serif
 }
 
 .p-related__item a:before {
