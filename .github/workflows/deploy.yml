@@ -13,6 +13,7 @@ jobs:
       with:
         hugo-version: '0.74.3'
     - run: hugo --minify
+    - run: echo thanish.me > public/CNAME
     - uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
