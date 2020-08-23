@@ -1,0 +1,36 @@
++++
+author = "Thanish"
+categories = ["git", "github"]
+date = 2014-03-27T13:00:00Z
+description = ""
+draft = false
+slug = "create-an-empty-git-branch"
+tags = ["git", "github"]
+title = "Create an empty git branch"
+
++++
+
+
+It’s really easy to create a new empty git branch with no parents (AKA orphan branches). First create an orphan branch with this command.
+
+```bash
+git checkout --orphan newbranch
+```
+
+Now you can remove any files in the directory and finally push it to a Github repository.
+
+```bash
+git rm -rf *
+git push origin newbranch
+```
+
+If you create branch in Github it’ll create the branch from **master** (which is what you’re going to do most of the time). Sometimes it makes more sense to create new branches. Example:
+
+* Documentations
+* Code Rewrites
+* Github Pages
+
+I learned this a while ago from a [Github Post](https://help.github.com/articles/creating-project-pages-manually).
+
+Original Post: [https://mnmtanish.svbtle.com/create-an-empty-git-branch](https://mnmtanish.svbtle.com/create-an-empty-git-branch)
+

@@ -1,0 +1,115 @@
++++
+author = "Thanish"
+categories = ["js"]
+date = 2014-03-29T13:00:00Z
+description = ""
+draft = false
+slug = "elastic-iframes"
+tags = ["js"]
+title = "Elastic Iframes"
+
++++
+
+
+Sometimes it become necessary to use iframes when building some web  applications. Often we have them hidden but sometimes iframes can be  useful visible too.
+
+For Node Knockout 2013, I was working with Meteorhacks on [Open  Comment Box](meteorhacks.2013.nodeknockout.com). It’s like a self-hosted  Disqus alternative. We kept the comments view inside an iframe to make  sure it doesn’t clash with main website styles and for security reasons.  The comment system is real-time. So, comments visible changes  frequently and it required the iframe containing these comments to  resize in order to avoid scrollbars.
+
+If we’re on the same origin, one of the things we can do is to continually check if the **scrollHeight** of the child frame document body changes and update the iframe height.
+
+```js
+(function (iframe) {
+
+    var prevHeight = null;
+
+    setInterval(function () {
+        if(prevHeight!==iframe.contentDocument.body.scrollHeight){
+            prevHeight = iframe.contentDocument.body.scrollHeight;
+            iframe.style.height = prevHeight + 'px';
+        }
+    });
+
+})(document.getElementById('iframe'));
+
+```
+
+Because of security approaches taken by modern web browsers, this  will not work if you have the iframe and parent window in different  origins. This is a security enhancement, not a bug so can’t much expect  it to get _fixed_ in the future.
+
+If pages belong to different origins the parent window is not allowed to access information about content inside the iframe. **I’ll be spooked out of my skin if it can and definitely avoid using such a web browser**.
+
+As a cross-origin solution, what we can do is to move the function  which tracks height changes to the page loaded inside the iframe (_Assuming you can control both parent and child frame pages_). And use **postMessage** to update the height on parent window. To keep things more interesting  I’m going to use mozilla jschannel to organize postMessage messages.
+
+First, include jschannel by adding this script tag to both pages (parent window and page inside iframe).
+
+```html
+<script src="//cdnjs.cloudflare.com/ajax/libs/jschannel/1.0.0-git-commit1-8c4f7eb/jschannel.min.js"></script>
+
+```
+
+And this snippet inside the child frame page scripts which creates  the jschannel, detects changes to body height and sends messages to the  parent page via jschannel.
+
+```js
+(function () {
+
+  function DO_NOTHING () {}
+
+  var channel = null;
+  var prevHeight = null;
+
+  document.addEventListener('DOMContentLoaded', function () {
+    channel = Channel.build({
+       window: window.parent
+      ,origin: '*'
+      ,scope: 'test_scope'
+    });
+    setInterval(watchDocumentHeight, 250);
+  })
+
+  function watchDocumentHeight() {
+    if (prevHeight !== document.body.scrollHeight) {
+      channel.call({
+         method: 'resize'
+        ,params: document.body.scrollHeight
+        ,success: DO_NOTHING
+      });
+      prevHeight = document.body.scrollHeight;
+    }
+  }
+
+})();
+
+
+```
+
+And this one inside the parent page scripts to prepare the jschannel, wait for messages and update the height.
+
+```js
+(function (iframe) {
+
+  var channel = null;
+
+  document.addEventListener('DOMContentLoaded', function () {
+    channel = Channel.build({
+       window: iframe.contentWindow
+      ,origin: '*'
+      ,scope: 'test_scope'
+      ,onReady: onChannelReady
+    });
+  })
+
+  function onChannelReady () {
+    channel.bind('resize', onResize);
+  }
+
+  function onResize (trans, data) {
+    iframe.style.height = data + 'px';
+  }
+
+})(document.getElementById('iframe'));
+
+```
+
+Is this all really necessary? We can make the code much shorter if we  use window.postMessage directly but if you’re using iframes, most  probably you’ll need to use if for more than changing the height.  Mozilla jschannel can help you when it comes to organizing postMessage  channels.
+
+Original Post: [https://mnmtanish.svbtle.com/elastic-iframes-autogrow-height](https://mnmtanish.svbtle.com/elastic-iframes-autogrow-height)
+
