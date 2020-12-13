@@ -1,4 +1,5 @@
-import 'theme/globals.css';
+import 'theme/styles/globals.css';
+import 'theme/styles/github-markdown.css';
 import { PageLayout } from 'theme/PageLayout';
 
 function MyApp({ Component, pageProps }) {
