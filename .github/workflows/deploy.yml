@@ -2,20 +2,19 @@ name: Deploy
 
 on:
   push:
-    branches: [ master ]
+    branches:
+      - master
 
 jobs:
-  deploy:
+  publish:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: peaceiris/actions-hugo@v2
-      with:
-        hugo-version: '0.74.3'
-    - run: hugo --minify
-    - run: echo thanish.me > public/CNAME
-    - uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_branch: public
-        publish_dir: public
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+      - run: npm ci
+      - run: npm run export
+      - run: echo thanish.me > build/CNAME
+      - uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: build
