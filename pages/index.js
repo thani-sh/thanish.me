@@ -6,7 +6,7 @@ export default function Homepage() {
   return (
     <>
       <Head>
-        <title>thanish.me</title>
+        <title>Thanish.me - Some really bad code for you!</title>
         <meta name="description" content="Some really bad code for you!"></meta>
       </Head>
       {posts.map((post, i) => (
