@@ -58,6 +58,14 @@ const SHAPE_TYPES = [
     [1, 1],
     [1, 1],
   ],
+  [
+    [1, 0, 0],
+    [1, 1, 1],
+  ],
+  [
+    [0, 1, 0],
+    [1, 1, 1],
+  ],
 ];
 ```
 
@@ -75,22 +83,22 @@ const ACTION_TYPES = {
 };
 ```
 
-The player holds a listener function and calls it when the user performs certain actions. We will require a listener function and a map of keycode to action functions.
+These actions are triggered by user interactions. We can map these actions to keys on the keyboard. Let's do it for 2 players.
 
 ```js
-const startPlayer = (keymap, listener) => {
-  document.addEventListener('keydown', (e) => {
-    for (const key of Object.keys(keymap)) {
-      if (e.code === key) {
-        listener(keymap[key]);
-        break;
-      }
-    }
-  });
-};
+const keymaps = [
+  {
+    KeyA: ACTION_TYPES.moveLeft,
+    KeyD: ACTION_TYPES.moveRight,
+  },
+  {
+    ArrowLeft: ACTION_TYPES.moveLeft,
+    ArrowRight: ACTION_TYPES.moveRight,
+  },
+];
 ```
 
-We don't even have a game to play with but we already have some technical debt :D. Let's clean it up just to keep things clean.
+The player holds a listener function and calls it when the user performs certain actions. It will need a listener function and a map of keycode => action functions. Because this adds an event listener, let's return a function which can be used to clean things up.
 
 ```js
 // the returned function must be called to destroy the player
@@ -111,22 +119,128 @@ const startPlayer = (keymap, listener) => {
 };
 ```
 
-And next, the game world. It will bring all the players and the shapes together and renders the output using the given renderer.
+And next, the game world. It will bring all the players and the shapes together and renders the output using the given renderer. Let's implement only the part where it listens to player actions and applies them on their active shapes and then renders the result.
 
 ```js
-const startWorld = (keymaps, renderer) => {
-  const playerActionListener = (i, action) => {
-    // TODO: apply action on the active shape
+const startWorld = (keymaps, renderer, options) => {
+  const PLAYER_COLORS = ['#6fa8dc', '#f6b26b'];
+  const playersCount = keymaps.length;
+  const playerShapes = [];
+  const stopPlayerFns = [];
+  const requestReRender = () => {
+    renderer(playerShapes);
   };
-  const stopPlayerFunctions = [];
-  for (let i = 0; i < keymaps.length; ++i) {
+  const createNewShape = (i) => {
+    const index = Math.floor(Math.random() * SHAPE_TYPES.length);
+    const shape = { x: 0, y: 0, type: SHAPE_TYPES[index], color: '#111' };
+    shape.x = Math.floor((options.worldWidth / playersCount / 2) * (i * 2 + 1));
+    shape.color = PLAYER_COLORS[i % PLAYER_COLORS];
+    playerShapes[i].unshift(shape);
+    requestReRender();
+  };
+  const canPerformAction = (i, action) => {
+    // TODO: implement checks
+    return true;
+  };
+  const playerActionListener = (i, action) => {
+    if (!canPerformAction(i, action)) {
+      return;
+    }
+    const shape = playerShapes[i][0];
+    action(shape);
+    requestReRender();
+  };
+  for (let i = 0; i < playersCount; ++i) {
+    playerShapes[i] = [];
+    createNewShape(i);
+  }
+  for (let i = 0; i < playersCount; ++i) {
     const keymap = keymaps[i];
     const listener = (action) => playerActionListener(i, action);
-    stopPlayerFunctions[i] = startPlayer(keymap, listener);
+    stopPlayerFns[i] = startPlayer(keymap, listener);
   }
 
   return () => {
-    stopPlayerFunctions.forEach((fn) => fn());
+    stopPlayerFns.forEach((fn) => fn());
   };
 };
 ```
+
+Let's see how it works with a test renderer.
+
+```js
+const renderer = (shapes) => {
+  console.log('render:');
+  console.log(JSON.stringify(shapes[0]));
+  console.log(JSON.stringify(shapes[1]));
+};
+const options = {
+  worldWidth: 32,
+};
+startWorld(keymaps, renderer);
+```
+
+Seems to be working fine :)
+
+Let's go ahead and create a simple canvas renderer so we can see what's going on.
+
+```js
+const createRenderer = (canvas, options) => {
+  const canvasWidth = options.worldWidth * options.worldScale;
+  const canvasHeight = options.worldHeight * options.worldScale;
+  canvas.width = canvasWidth;
+  canvas.height = canvasHeight;
+  const ctx = canvas.getContext('2d');
+
+  const renderBlock = (x, y, color) => {
+    ctx.fillStyle = color;
+    ctx.strokeStyle = '#000';
+    ctx.fillRect(
+      x * options.worldScale,
+      y * options.worldScale,
+      options.worldScale,
+      options.worldScale
+    );
+    ctx.strokeRect(
+      x * options.worldScale,
+      y * options.worldScale,
+      options.worldScale,
+      options.worldScale
+    );
+  };
+
+  const renderShape = (shape) => {
+    ctx.save();
+    ctx.translate(shape.x * options.worldScale, shape.y * options.worldScale);
+    for (let i = 0; i < shape.type.length; ++i) {
+      const row = shape.type[i];
+      for (let j = 0; j < row.length; ++j) {
+        if (row[j]) {
+          renderBlock(j, i, shape.color);
+        }
+      }
+    }
+    ctx.restore();
+  };
+
+  return (playerShapes) => {
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+    for (let i = 0; i < playerShapes.length; ++i) {
+      const shapes = playerShapes[i];
+      for (let j = 0; j < shapes.length; ++j) {
+        renderShape(shapes[j]);
+      }
+    }
+  };
+};
+```
+
+The end result looks something like this. Try pressing the "A", "D" keys on the keyboard while the iframe is in focus. It should move the shape left or right.
+
+<iframe
+  src="2020-12-13-multiplayer-tetris-game/frames/version-1"
+  width="100%"
+  height="600"
+  frameBorder="none"
+  scrolling="no"
+/>
