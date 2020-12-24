@@ -167,7 +167,7 @@ export default function GameDemo() {
         position: 'absolute',
         top: 0,
         left: 0,
-        background: '#eee',
+        background: '#fafafa',
       }}
     />
   );

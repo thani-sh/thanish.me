@@ -80,6 +80,21 @@ const ACTION_TYPES = {
   moveRight: (shape) => {
     shape.x++;
   },
+
+  moveDown: (shape) => {
+    shape.y++;
+  },
+
+  rotateShape: (shape) => {
+    const type = [];
+    for(let i = 0; i < shape.type[0].length; ++i) {
+      type[i] = [];
+      for(let j = 0; j < shape.type.length; ++j) {
+        type[i][j] = shape.type[shape.type.length - 1 - j][i];
+      }
+    }
+    shape.type = type;
+  },
 };
 ```
 
@@ -88,11 +103,15 @@ These actions are triggered by user interactions. We can map these actions to ke
 ```js
 const keymaps = [
   {
+    KeyW: ACTION_TYPES.rotateShape,
     KeyA: ACTION_TYPES.moveLeft,
+    KeyS: ACTION_TYPES.moveDown,
     KeyD: ACTION_TYPES.moveRight,
   },
   {
+    ArrowUp: ACTION_TYPES.rotateShape,
     ArrowLeft: ACTION_TYPES.moveLeft,
+    ArrowDown: ACTION_TYPES.moveDown,
     ArrowRight: ACTION_TYPES.moveRight,
   },
 ];
@@ -244,3 +263,191 @@ The end result looks something like this. Try pressing the "A", "D" keys on the 
   frameBorder="none"
   scrolling="no"
 />
+
+The next step is to make things move downwards. We can do that by moving the players active shape 1 unit downwards each second.
+
+```js
+const startWorld = (keymaps, renderer, options) => {
+  // ...
+  const stopGameClock = ticker(() => {
+    for (let i = 0; i < playerShapes.length; ++i) {
+      playerActionListener(i, ACTION_TYPES.moveDown)
+    }
+  });
+  // ...
+
+  return () => {
+    stopGameClock();
+    // ...
+  };
+};
+```
+
+The next step is to add some rules to the game world. We can check against these rules before performing any actions. In some cases, rules may trigger the game to emit a new shape. Let's define what the rules can do.
+
+```js
+const RULE_ACTIONS = {
+  BLOCK_ACTION: 1,
+  CREATE_SHAPE: 2,
+  END_THE_GAME: 3,
+};
+```
+
+And then change the player action listener to check the rules.
+
+```js
+const startWorld = (keymaps, renderer, ticker, ruleset, options) => {
+  // ...
+  const playerActionListener = (i, action) => {
+    const activeShape = playerShapes[i][0];
+    const simulated = Object.create(activeShape);
+    action(simulated);
+    for (let j = 0; j < ruleset.length; ++j) {
+      const ruleFn = ruleset[j];
+      const result = ruleFn(simulated, activeShape, playerShapes);
+      if (result === RULE_ACTIONS.BLOCK_ACTION) {
+        return;
+      } else if (result === RULE_ACTIONS.CREATE_SHAPE) {
+        createNewShape(i);
+        return;
+      } else if (result === RULE_ACTIONS.END_THE_GAME) {
+        alert('GAME OVER!');
+        stopWorld();
+      }
+    }
+    action(activeShape);
+    requestReRender();
+  };
+  const stopGameClock = ticker(() => {
+    for (let i = 0; i < playerShapes.length; ++i) {
+      playerActionListener(i, ACTION_TYPES.moveDown);
+    }
+  });
+  const stopWorld = () => {
+    stopGameClock();
+    stopPlayerFns.forEach((fn) => fn());
+  };
+  // ...
+  return stopWorld;
+};
+```
+
+And add some rules to the game world.
+
+```js
+const createGameRules = (options) => {
+  const doesBBoxOverlap = (s1, s2) => {
+    if (
+      s1.x > s2.x + s2.type[0].length ||
+      s1.x + s1.type[0].length < s2.x ||
+      s1.y > s2.y + s2.type.length ||
+      s1.y + s1.type.length < s2.y
+    ) {
+      return false;
+    }
+    return true;
+  };
+  const doesBlockOverlap = (s1, row, col, s2) => {
+    if (!s1.type[row][col]) {
+      return false;
+    }
+    const s2row = row + s1.y - s2.y;
+    const s2col = col + s1.x - s2.x;
+    if (s2.type[s2row] && s2.type[s2row][s2col]) {
+      return true;
+    }
+    return false;
+  };
+  const getOtherShapes = function* (activeShape, playerShapes) {
+    for (let i = 0; i < playerShapes.length; ++i) {
+      const shapes = playerShapes[i];
+      for (let j = 0; j < shapes.length; ++j) {
+        const shape = shapes[j];
+        if (shape === activeShape) {
+          continue;
+        }
+        yield [shape, j === 0];
+      }
+    }
+  };
+  const isBlockedFromLeft = (simulated, activeShape, playerShapes) => {
+    if (simulated.type === activeShape.type && simulated.x >= activeShape.x) {
+      return null;
+    }
+    if (simulated.x < 0) {
+      return RULE_ACTIONS.BLOCK_ACTION;
+    }
+    for (let [shape] of getOtherShapes(activeShape, playerShapes)) {
+      if (!doesBBoxOverlap(simulated, shape)) {
+        continue;
+      }
+      const col = 0;
+      for (let row = 0; row < simulated.type.length; ++row) {
+        if (doesBlockOverlap(simulated, row, col, shape)) {
+          return RULE_ACTIONS.BLOCK_ACTION;
+        }
+      }
+    }
+    return null;
+  };
+  const isBlockedFromRight = (simulated, activeShape, playerShapes) => {
+    if (simulated.type === activeShape.type && simulated.x <= activeShape.x) {
+      return null;
+    }
+    if (simulated.x + simulated.type[0].length > options.worldWidth) {
+      return RULE_ACTIONS.BLOCK_ACTION;
+    }
+    for (let [shape] of getOtherShapes(activeShape, playerShapes)) {
+      if (!doesBBoxOverlap(simulated, shape)) {
+        continue;
+      }
+      const col = simulated.type[0].length - 1;
+      for (let row = 0; row < simulated.type.length; ++row) {
+        if (doesBlockOverlap(simulated, row, col, shape)) {
+          return RULE_ACTIONS.BLOCK_ACTION;
+        }
+      }
+    }
+    return null;
+  };
+  const isBlockedFromBottom = (simulated, activeShape, playerShapes) => {
+    if (simulated.type === activeShape.type && simulated.y <= activeShape.y) {
+      return null;
+    }
+    if (simulated.y + simulated.type.length > options.worldHeight) {
+      return RULE_ACTIONS.CREATE_SHAPE;
+    }
+    for (let [shape, isActive] of getOtherShapes(activeShape, playerShapes)) {
+      if (!doesBBoxOverlap(simulated, shape)) {
+        continue;
+      }
+      const row = simulated.type.length - 1;
+      for (let col = 0; col < simulated.type[0].length; ++col) {
+        if (doesBlockOverlap(simulated, row, col, shape)) {
+          if (simulated.y <= 0) {
+            return RULE_ACTIONS.END_THE_GAME;
+          }
+          if (isActive) {
+            return RULE_ACTIONS.BLOCK_ACTION;
+          }
+          return RULE_ACTIONS.CREATE_SHAPE;
+        }
+      }
+    }
+    return null;
+  };
+  return [isBlockedFromLeft, isBlockedFromRight, isBlockedFromBottom];
+};
+```
+
+The result looks like this. Please click on the button to start the game.
+
+<iframe
+  src="2020-12-13-multiplayer-tetris-game/frames/version-2"
+  width="100%"
+  height="600"
+  frameBorder="none"
+  scrolling="no"
+/>
+
+We can stop it here for the MVP. There's a lot of work left to do which we'll cover in future blog posts.
