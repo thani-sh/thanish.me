@@ -2,8 +2,11 @@ import Link from 'next/link';
 
 export const PostPreview = ({ link, meta }) => (
   <article>
-    <Link href={'/blog' + link}><h2>{meta.title}</h2></Link>
-    <p>{meta.info}</p>
-    <p><Link href={'/blog' + link}>Read More</Link></p>
+    <header>
+      <h1>
+        <Link href={'/blog' + link}>{meta.title}</Link>
+      </h1>
+    </header>
+    <main>{meta.intro}</main>
   </article>
 );

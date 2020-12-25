@@ -13,6 +13,9 @@ const SHAPE_TYPES = [
     [0, 1, 0],
     [1, 1, 1],
   ],
+  [
+    [1, 1, 1],
+  ],
 ];
 
 const ACTION_TYPES = {
@@ -308,30 +311,25 @@ const keymaps = [
 
 const options = {
   worldWidth: 32,
-  worldHeight: 24,
+  worldHeight: 16,
   worldScale: 25,
 };
 
 export default function GameDemo() {
   const canvasRef = useRef(null);
-  const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
-    if (process.browser && canvasRef && enabled) {
+    if (process.browser && canvasRef) {
       const renderer = createRenderer(canvasRef.current, options);
-      const ticker = createTicker(1000);
+      const ticker = createTicker(500);
       const ruleset = createGameRules(options);
       startWorld(keymaps, renderer, ticker, ruleset, options);
     }
-  }, [canvasRef, enabled]);
+  }, [canvasRef]);
 
   return (
-    <div style={{ position: 'absolute', top: 0, left: 0 }}>
-      {enabled ? (
-        <canvas ref={canvasRef} style={{ background: '#fafafa' }} />
-      ) : (
-        <button onClick={() => setEnabled(true)}>Start</button>
-      )}
+    <div style={{ position: 'absolute', top: 0, left: 0, width: '100%' }}>
+      <canvas ref={canvasRef} style={{ display: 'block', margin: '0 auto'}} />
     </div>
   );
 }

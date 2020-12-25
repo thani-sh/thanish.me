@@ -1,59 +1,89 @@
 import { createPostContent } from 'theme/PostContent';
-import imgTetrisGame from './images/tetris-game.png';
-import imgBasicComponents from './images/basic-components.png';
+import { LazyIframe } from 'theme/elements/LazyIframe';
+import img1 from './images/basic-components.png';
 
 export const meta = {
-  title: 'Multiplayer Tetris Game',
-  info:
-    'A tutorial about writing a multiplayer game from scratch. Starting from solidifying the requirements and continues all the way up to creating a working prototype.',
+  title: 'Multiplayer Tetris Game (part 1)',
+  description:
+    'A tutorial about writing a multiplayer game from scratch. Starting from solidifying the requirements and continues all the way up to creating a working prototype with vanilla js.',
+  intro: (
+    <section>
+      <p>
+        A tutorial about writing a multiplayer game from scratch. Starting from
+        solidifying the requirements and continues all the way up to creating a
+        working prototype with vanilla js. By the end of the tutorial we will
+        have the following game.
+      </p>
+      <LazyIframe
+        src="/blog/2020-12-13-multiplayer-tetris-game-part-1/embed/finished"
+        height="400px"
+      />
+      <p style={{ textAlign: 'center' }}>
+        <strong>Press `W, A, S, D` keys or the arrow keys to play</strong>
+      </p>
+    </section>
+  ),
   date: '2020-12-13',
   tags: ['js'],
 };
 
 export default createPostContent({ meta });
 
-# Multiplayer Tetris Game
+## Before We Start
 
-I just wanted to see what it would look like if multiple players try to play Tetris on the same canvas. Let's build this game in multiple rounds where the result of each iteration is a playable game.
+At a high level, these are our requirements for the game we're building with this tutorial. This is something similar to what we would get as requirements from an end user.
 
-<img src={imgTetrisGame} width="1000" height="700" alt="Tetris game concept" />
+### Requirements for Version 1
 
-These are our requirements for version 1:
+- R1: it should be possible for multiple players to play the game
+- R2: it should support all the basic rules of a "Tetris like" game
 
-- it should be possible for multiple players to play the game
-- it should support all the basic rules of a "Tetris" like game
+Let's break these down further and decide how we're going to solve these. I'm pretty sure we probably have this on our minds but it helps to write these things down.
 
-This is what we're NOT doing for version 1:
+#### "R1: it should be possible for multiple players to play the game"
 
-- avoid support for playing with multiple devices, create a split-screen multiplayer game
-- avoid support for mobile devices, touch controls, etc.
+There are many ways to do this. We'll go old school and build a "split-screen" multiplayer game. This way we don't need to build any server side components.
+
+#### "R2: it should support all the basic rules of a "Tetris like" game"
+
+What are rules of a tetris like game? let's work on this while we are building the game. We can add a few to get started.
+
+- R2.1: Shapes should never overlap with other shapes in the game.
+- R2.2: There is an "active shape" per player which can be rotated or moved left, right and down by the player.
+- R2.3: The active shape moves 1 unit downwards every 0.5 seconds until it lands on the floor or on another shape.
+- R2.4: A new shape is added when the game starts and when the active shape can no longer move downwards.
+- R2.5: When a new shape is added, it becomes the active shape and the previous active shape becomes inactive.
+- R2.6: The game is over when the shapes reaches the game world ceiling.
 
 ## Basic Components
 
-Before building, let's list down all the basic components. If we get this good enough, it may survive this version and some future versions of this game.
+Before building, let's list down all the basic components. If we get this good enough, it may survive this version and some future versions of this game. Making changes here will usually take more time than changing other parts of the code.
 
-<img
-  src={imgBasicComponents}
-  width="1000"
-  height="400"
-  alt="Basic components of the game"
-/>
+<img src={img1} width="1000" height="400" alt="Basic components of the game" />
 
-And we also need to define some rules to determine how it should behave. We may change these later but having some at the beginning makes it easy to develop.
+### Shapes and Shape Types
 
-- All shapes in the game world must be visible on the screen.
-- Shapes must not overlap with other shapes in the game world.
-- When the game clock ticks, active shapes will move downwards. If they cannot move downwards they will become inactive.
-- Players can move their active shapes left, right or rotate them using actions but only if there is enough empty space.
+In the game world, a shape would have a position and a type. It also needs a color so different players can have different colors. And we can change the color to represent other states as well (inactive?).
 
-I guess that's enough to get us started. Let's convert what we have designed so far to code to see if it all makes any sense.
+```ts
+interface Shape {
+  x: number;
+  y: number;
+  type: ShapeType;
+  color: string;
+}
+```
 
-## Writing the code
+We can represent each shape type as a 2D array. The '1's represent filled blocks and the '0's will represent holes.
 
-Let's start with a list of shape types. We can represent each shape type as a 2D array. The '1's represent filled blocks and the '0's will represent holes.
+```ts
+type ShapeType = number[][];
+```
 
-```js
-const SHAPE_TYPES = [
+And some example shape types we can use in the game. We have the square, "L", "T" and the "I" in order.
+
+```ts
+const SHAPE_TYPES: ShapeType[] = [
   [
     [1, 1],
     [1, 1],
@@ -66,13 +96,22 @@ const SHAPE_TYPES = [
     [0, 1, 0],
     [1, 1, 1],
   ],
+  [[1, 1, 1]],
 ];
 ```
 
-On the other end, we have the player. The most important thing we need from a player is to listen to actions from the player. So what are these actions? let's define actions as simple functions which manipulate the active shape. For example, the moveLeft and moveRight functions will modify the 'x' position of the shape.
+### Actions from the Player
 
-```js
-const ACTION_TYPES = {
+Let's define actions as simple functions which modify the active shape. For example, the moveLeft and moveRight functions will modify the 'x' position of the shape.
+
+```ts
+type PlayerAction = (shape: Shape) => void;
+```
+
+And some example player actions we can use in the game.
+
+```ts
+const ACTION_TYPES: { [name: string]: PlayerAction } = {
   moveLeft: (shape) => {
     shape.x--;
   },
@@ -87,9 +126,9 @@ const ACTION_TYPES = {
 
   rotateShape: (shape) => {
     const type = [];
-    for(let i = 0; i < shape.type[0].length; ++i) {
+    for (let i = 0; i < shape.type[0].length; ++i) {
       type[i] = [];
-      for(let j = 0; j < shape.type.length; ++j) {
+      for (let j = 0; j < shape.type.length; ++j) {
         type[i][j] = shape.type[shape.type.length - 1 - j][i];
       }
     }
@@ -100,8 +139,10 @@ const ACTION_TYPES = {
 
 These actions are triggered by user interactions. We can map these actions to keys on the keyboard. Let's do it for 2 players.
 
-```js
-const keymaps = [
+```ts
+type PlayerKeymap = { [key: string]: PlayerAction };
+
+const PLAYER_KEYMAPS: PlayerKeymap[] = [
   {
     KeyW: ACTION_TYPES.rotateShape,
     KeyA: ACTION_TYPES.moveLeft,
@@ -117,7 +158,42 @@ const keymaps = [
 ];
 ```
 
-The player holds a listener function and calls it when the user performs certain actions. It will need a listener function and a map of keycode => action functions. Because this adds an event listener, let's return a function which can be used to clean things up.
+### Inside the Game World
+
+There are several sub components in the game world, let's define them one by one. And also explain why we need them.
+
+#### The Game Clock
+
+The game world takes input from player actions and also from the game clock. When the clock "ticks" we move the active shape down. This is one of the requirements of the game (R2.3). The clock only needs to execute a given function for each tick.
+
+```ts
+type GameClock = (fn: () => void) => void;
+```
+
+#### The Game Rules
+
+Next we need some way to filter player actions. Given a player action the rule should decide whether we should apply it or not.
+
+```ts
+// TODO: would probably need more information to decide the outcome
+type GameRule = (action: PlayerAction) => 'apply' | 'dont_apply';
+```
+
+#### The Game Renderer
+
+The render receives an array of shapes to render in the game. We can group them by player so the renderer receives more information.
+
+```ts
+type GameRenderer = (shapesets: Shape[][]) => void;
+```
+
+## Let's write the code
+
+We will use the types we defined before but we will make changes if we need to.
+
+### Listening to Player Actions
+
+The player receives a listener function and calls it when the user performs actions. It will need a listener function and a map of keycode => action functions. Because this adds an event listener, let's return a function which can be used to clean things up.
 
 ```js
 // the returned function must be called to destroy the player
@@ -139,6 +215,8 @@ const startPlayer = (keymap, listener) => {
 ```
 
 And next, the game world. It will bring all the players and the shapes together and renders the output using the given renderer. Let's implement only the part where it listens to player actions and applies them on their active shapes and then renders the result.
+
+We also added an options object which we can use to configure the game world. Right now, it only has the world's width.
 
 ```js
 const startWorld = (keymaps, renderer, options) => {
@@ -201,7 +279,9 @@ startWorld(keymaps, renderer);
 
 Seems to be working fine :)
 
-Let's go ahead and create a simple canvas renderer so we can see what's going on.
+### Adding a Canvas Renderer
+
+Let's go ahead and create a simple canvas renderer so we can see what's going on. We also added `worldHeight` and `worldScale` to the options object.
 
 ```js
 const createRenderer = (canvas, options) => {
@@ -254,24 +334,16 @@ const createRenderer = (canvas, options) => {
 };
 ```
 
-The end result looks something like this. Try pressing the "A", "D" keys on the keyboard while the iframe is in focus. It should move the shape left or right.
+### Adding Gravity and Other Rules
 
-<iframe
-  src="2020-12-13-multiplayer-tetris-game/frames/version-1"
-  width="100%"
-  height="600"
-  frameBorder="none"
-  scrolling="no"
-/>
-
-The next step is to make things move downwards. We can do that by moving the players active shape 1 unit downwards each second.
+The next step is to make things move downwards. Let's apply these changes to the `startWorld` function.
 
 ```js
-const startWorld = (keymaps, renderer, options) => {
+const startWorld = (keymaps, renderer, ticker, options) => {
   // ...
   const stopGameClock = ticker(() => {
     for (let i = 0; i < playerShapes.length; ++i) {
-      playerActionListener(i, ACTION_TYPES.moveDown)
+      playerActionListener(i, ACTION_TYPES.moveDown);
     }
   });
   // ...
@@ -440,14 +512,13 @@ const createGameRules = (options) => {
 };
 ```
 
-The result looks like this. Please click on the button to start the game.
+## Are we there yet?
 
-<iframe
-  src="2020-12-13-multiplayer-tetris-game/frames/version-2"
-  width="100%"
-  height="600"
-  frameBorder="none"
-  scrolling="no"
+The code we have written so far brings us to this:
+
+<LazyIframe
+  src="/blog/2020-12-13-multiplayer-tetris-game-part-1/embed/finished"
+  height="400px"
 />
 
 We can stop it here for the MVP. There's a lot of work left to do which we'll cover in future blog posts.
