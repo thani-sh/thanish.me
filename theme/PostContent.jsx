@@ -4,7 +4,7 @@ export const PostContent = ({ meta, children }) => (
   <article>
     <Head>
       <title>Thanish.me - {meta.title}</title>
-      <meta name="description" content={meta.info}></meta>
+      <meta name="description" content={meta.description}></meta>
     </Head>
     <header>
       <h1>{meta.title}</h1>
