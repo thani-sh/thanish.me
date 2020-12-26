@@ -1,0 +1,114 @@
+
+import { createPostContent } from 'theme/PostContent';
+
+
+export const meta = {
+  title: "Limit Go Benchmark b.N",
+  description: "**TLDR** - Operations count (b.N) can be set inside the function.",
+  intro: (
+    <section>
+      <p>**TLDR** - Operations count (b.N) can be set inside the function.</p>
+    </section>
+  ),
+  date: "2015-07-23",
+  tags: ["go"],
+};
+
+export default createPostContent({ meta });
+
+**TLDR** - Operations count (b.N) can be set inside the function.
+
+Go benchmarks can be extremely useful when attempting to write  performance critical applications. Both cpu and memory benchmarks can be  written for Go programs.
+
+```go
+func BenchmarkHello(b *testing.B) {
+  for i := 0; i < b.N; i++ {
+    fmt.Sprintf("hello")
+  }
+}
+```
+
+In the above example, the `fmt.Sprintf` function is run `b.N` times in order to get a good measurement. The `b.N` is usually a large number sometimes can exceed millions. Go benchmarks usually start with a small number for `b.N` and it's increased while running the benchmark until the benchmark is  run for a certain time. The benchmark time can be changed by setting the `-benchtime` argument when running the test. This can be demonstrated by this simple benchmark.
+
+```go
+func BenchmarkZero(b *testing.B) {
+  fmt.Println("N =", b.N)
+  sleepForNs(b.N)
+}
+```
+
+As expected, go will run this benchmark function multiple times increasing `b.N` each time until required time is reached. Logs from the test will be similar to the log given below.
+
+```
+testing: warning: no tests to run
+PASS
+BenchmarkHello	N = 1
+N = 100
+N = 10000
+N = 1000000
+N = 100000000
+N = 2000000000
+2000000000	         1.00 ns/op
+ok  	temporary/test	2.117s
+
+```
+
+**In some cases it's not feasible to run a benchmark that number of times.** For an example, if the benchmark involves writing data to the disk,  benchmarks would often crash with a "too many open files" error.
+
+Being able to limit benchmark operations count makes it possible to  write benchmarks for even more complex code. Unfortunately although  there's an argument to set the benchmark time and none for setting the  count. Limiting benchmark count is extremely easy it would be silly to  write a blog post on it if it's documented. It can be set simply by  changing `b.N` inside the benchmark to an appropriate number.  The above example benchmark can be compared to one where we've set the  number of Ops to verify.
+
+```go
+package test
+
+import (
+    "fmt"
+    "testing"
+)
+
+func BenchmarkOne(b *testing.B) {
+    b.N = b.N + 1 - 1
+    fmt.Println("N =", b.N)
+    sleepForNs(b.N * 1000)
+}
+
+func BenchmarkTwo(b *testing.B) {
+    b.N = b.N + 100000 - b.N
+    fmt.Println("N =", b.N)
+    sleepForNs(b.N * 1000)
+}
+```
+
+The output would be similar to this:
+
+```
+testing: warning: no tests to run
+PASS
+BenchmarkOne    N = 1
+N = 100
+N = 10000
+N = 1000000
+ 1000000        1003 ns/op
+BenchmarkTwo    N = 100000
+N = 100000
+N = 100000
+N = 100000
+N = 100000
+N = 100000
+N = 100000
+N = 100000
+N = 100000
+N = 100000
+N = 100000
+N = 100000
+N = 100000
+N = 100000
+N = 100000
+N = 100000
+  100000        1001 ns/op
+ok      temporary/test  2.672s
+
+```
+
+We can clearly see that this doesn't affect the benchmark results as  both versions take approximately 1000s/op. The second benchmark function  had to be run more times in order to fill the required time period.
+
+This method is tested only on Go v1.4 (latest stable version). Please  note that this is feature was not documented  therefore it can change  and may not work the same way on other Go versions.

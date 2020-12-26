@@ -1,0 +1,42 @@
+
+import { createPostContent } from 'theme/PostContent';
+
+
+export const meta = {
+  title: "Empty Function Shorthand",
+  description: "JavaScript is an interesting language and so far my favorite. Maybe  it's just me but I find stuff some people complain about javascript such  as _automatic semicolon insertion, the way javascript scoping works and function/variable hoisting_ to be some of its best features.",
+  intro: (
+    <section>
+      <p>JavaScript is an interesting language and so far my favorite. Maybe  it's just me but I find stuff some people complain about javascript such  as _automatic semicolon insertion, the way javascript scoping works and function/variable hoisting_ to be some of its best features.</p>
+    </section>
+  ),
+  date: "2014-08-13",
+  tags: ["js"],
+};
+
+export default createPostContent({ meta });
+
+JavaScript is an interesting language and so far my favorite. Maybe  it's just me but I find stuff some people complain about javascript such  as _automatic semicolon insertion, the way javascript scoping works and function/variable hoisting_ to be some of its best features.
+
+Sometimes javascript functions may require `Function` arguments or callbacks when you don't want to. This can happen often  when you're writing mock components for tests. I used to do this by
+
+```js
+var do_nothing = function(){};
+foo('bar', do_nothing);
+```
+
+You can get get the same result by using the `Function` constructor and make the code a tiny bit cleaner. This is not a random  hack either. If you check what happens, it also makes sense. The demo  code would look like this when using the constructor.
+
+```js
+foo('bar', Function());
+```
+
+What happens is, `Function()` returns a `Function` object with an empty body so it does nothing interesting. If you're  still not sure, copy the following code to your browser console or node  REPL.
+
+```js
+Function().toString();
+```
+
+---
+
+**Update:** found out that `Function.prototype` is an empty function and a much better choice because you're not creating new functions like the `Function()` constructor does.

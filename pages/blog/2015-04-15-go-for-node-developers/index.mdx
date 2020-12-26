@@ -1,0 +1,77 @@
+
+import { createPostContent } from 'theme/PostContent';
+
+
+export const meta = {
+  title: "Go for Node developers",
+  description: "I'm developing Node apps for years and started working with Go last  month. So far, I like it as much as I like Node. So I hope to blog some  quick tips about Go (aka Golang) for Node developers starting with the  $GOPATH. I'll start with some boring stuff and quickly move on to  something useful. If you haven't tried go yet, [this](https://golang.org/doc/code.html) is a good page to start.",
+  intro: (
+    <section>
+      <p>I'm developing Node apps for years and started working with Go last  month. So far, I like it as much as I like Node. So I hope to blog some  quick tips about Go (aka Golang) for Node developers starting with the  $GOPATH. I'll start with some boring stuff and quickly move on to  something useful. If you haven't tried go yet, [this](https://golang.org/doc/code.html) is a good page to start.</p>
+    </section>
+  ),
+  date: "2015-04-15",
+  tags: ["node","go"],
+};
+
+export default createPostContent({ meta });
+
+I'm developing Node apps for years and started working with Go last  month. So far, I like it as much as I like Node. So I hope to blog some  quick tips about Go (aka Golang) for Node developers starting with the  $GOPATH. I'll start with some boring stuff and quickly move on to  something useful. If you haven't tried go yet, [this](https://golang.org/doc/code.html) is a good page to start.
+
+## The $GOPATH
+
+It's sort of like **one path to rule them all** solution. All your Go projects and their dependencies go here. This is a  bit different from node_modules. The $GOPATH contains following  directories.
+
+```
+bin/  # compiled binaries
+pkg/  # compiled non-binary packages
+src/  # package source files
+
+```
+
+And there are several approaches to managing the $GOPATH.
+
+### Per-app $GOPATH
+
+This is the way I tried first because it was similar to having a  node_modules directory. Your project would look something like this.
+
+```
+bin/
+pkg/
+src/
+  app/         # app source files
+    main.go
+    ...
+  github.com/  # dependencies
+  ...
+
+```
+
+When checking into a repo, add the complete $GOPATH with all dependencies. Add the `bin` and `pkg` directories to your .gitignore file. This way you will have all your  dependency versions fixed. The bad side of this approach is that you'll  have to set the $GOPATH environment variable quite a lot. This can get  pretty annoying. And you may work with an incorrect $GOPATH by mistake.
+
+### Global $GOPATH
+
+Others use a common $GOPATH for all their projects. Dependencies are  usually kept to their latest versions. I know this sounds like  installing everything globally with npm. Anyways, it's not as bad as it  would be if we're doing this with Node. Mostly because Go applications  wouldn't have many external dependencies (compare that to Node).
+
+```
+bin/
+pkg/
+src/
+  github.com/
+    username/
+      app-1/
+        main.go
+        ...
+      app-2/
+        main.go
+        ...
+
+```
+
+I'm not really feeling comfortable with mixing everything but it  usually gets the job done. If you're starting with Go, don't waste time  worrying about versions and go ahead with a common $GOPATH.
+
+### Global $GOPATH with Godeps
+
+Another way to manage dependencies is vendoring. It can be done  easily with Godep. With Godeps you can create a snapshot of all your  dependencies. This successfully freezes dependencies to the exact  version. It also saves a copy of all dependencies so you don't need to  worry if the author takes the repo down (... maybe you should).
+
+[More about Godep](http://godoc.org/github.com/tools/godep)

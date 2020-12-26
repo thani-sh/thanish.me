@@ -1,0 +1,79 @@
+
+import { createPostContent } from 'theme/PostContent';
+
+
+export const meta = {
+  title: "Isolated Testing",
+  description: "Just thought of sharing something about writing tests with  JavaScript. Usually, it's best to keep tests simple and test just one  thing per test (the _thing_ is most of the time just a _function_).",
+  intro: (
+    <section>
+      <p>Just thought of sharing something about writing tests with  JavaScript. Usually, it's best to keep tests simple and test just one  thing per test (the _thing_ is most of the time just a _function_).</p>
+    </section>
+  ),
+  date: "2014-09-08",
+  tags: ["js"],
+};
+
+export default createPostContent({ meta });
+
+Just thought of sharing something about writing tests with  JavaScript. Usually, it's best to keep tests simple and test just one  thing per test (the _thing_ is most of the time just a _function_).
+
+If we use functions we're about to test the way we use them in real  programs, tests can get very lengthy and complicated easily. Usually  we'll have to write more boilerplate code than real test code. And even  worse, tests may fail for the _wrong reason_. As a really simple example, assume we want to test the constructor here.
+
+```js
+function Person (name) {
+  this._validateName(name);
+  this.name = name;
+}
+
+Person.prototype._validateName = function (name) {
+  assert.equal(typeof name, 'string');
+}
+```
+
+This is how I used to write tests.
+
+```js
+describe('constructor', function() {
+  it('should validate the name', function() {
+    var original = Person.prototype._validateName;
+    Person.prototype._validateName = function (name) {
+        this.name__ = name;
+    };
+    var person = new Person('name');
+    assert.equal(person.name__, 'name');
+    Person.prototype._validateName = original;
+  });
+
+  it('should save the name', function() {
+    var person = new Person('name');
+    assert.equal(person.name, 'name');
+  });
+});
+```
+
+When testing certain parts, I had to temporarily change the prototype  and restore it after the test. And I also had to consider the rest of  the program too. In this example, I must make sure the `name` is a string, otherwise it'll throw an error and tests will fail. What  we must remember is that the constructor is only responsible for calling  the validation function and not how the validation works. This can get  extremely complex when dealing with large data structures.
+
+Thanks to JavaScript `function.call`, we can isolate the function we're about to test from the rest of the class/prototype. We can write tests like this.
+
+```js
+describe('constructor', function() {
+  it('should validate the name', function() {
+    var person = {
+        _validateName: function (name) {
+            this.name__ = name;
+        }
+    };
+    Person.call(person, 1);
+    assert.equal(person.name__, 1);
+  });
+
+  it('should save the name', function() {
+    var person = {_validateName: Function.prototype};
+    Person.call(person, 1);
+    assert.equal(person.name, 1);
+  });
+});
+```
+
+As an added advantage, we can clearly see what other parts the  function interacts with and how it interacts with other parts of the  program.
