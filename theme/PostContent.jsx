@@ -8,6 +8,9 @@ export const PostContent = ({ meta, children }) => (
     </Head>
     <header>
       <h1>{meta.title}</h1>
+      <p className="post-meta">
+        <small>Posted on {meta.date}</small>
+      </p>
       <main>{meta.intro}</main>
     </header>
     <main>{children}</main>
