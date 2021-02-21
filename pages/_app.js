@@ -1,6 +1,5 @@
-import 'theme/styles/globals.css';
-import 'theme/styles/github-markdown.css';
-import 'theme/styles/theme-specific.css';
+import 'theme/styles/content.css';
+import 'theme/styles/customs.css';
 import { PageLayout } from 'theme/PageLayout';
 
 function MyApp({ Component, pageProps }) {

@@ -76,7 +76,7 @@ const startWorld = (keymaps, renderer, ticker, ruleset, options) => {
   const createNewShape = (i) => {
     const index = Math.floor(Math.random() * SHAPE_TYPES.length);
     const shape = { x: 0, y: 0, type: SHAPE_TYPES[index], color: '#111' };
-    shape.x = Math.floor((options.worldWidth / playersCount / 2) * (i * 2 + 1));
+    shape.x = Math.floor((options.worldWidth / playersCount / 2) * (i * 2 + 1) - 1);
     shape.y = -shape.type.length;
     shape.color = PLAYER_COLORS[i % PLAYER_COLORS.length];
     playerShapes[i].unshift(shape);
@@ -316,7 +316,7 @@ const keymaps = [
 ];
 
 const options = {
-  worldWidth: 32,
+  worldWidth: 16,
   worldHeight: 16,
   worldScale: 25,
 };
@@ -334,8 +334,8 @@ export default function GameDemo() {
   }, [canvasRef]);
 
   return (
-    <div style={{ position: 'absolute', top: 0, left: 0, width: '100%' }}>
-      <canvas ref={canvasRef} style={{ display: 'block', margin: '0 auto'}} />
+    <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', background: '#ddd' }}>
+      <canvas ref={canvasRef} style={{ display: 'block', margin: '0 auto', background: '#fff' }} />
     </div>
   );
 }

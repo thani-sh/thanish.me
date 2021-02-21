@@ -12,6 +12,11 @@ export const meta = {
         try whether it's possible to fix bugs easily and whether we can add some new
         features to the game without major code/design changes.
       </p>
+      <p>Did it work? uou can try the updated game here (Instructions: click to focus and use ↑←↓→ keys and WASD keys)</p>
+      <LazyIframe
+        src="/blog/2021-01-24-multiplayer-tetris-game-part-2/embed/finished"
+        height="400px"
+      />
     </section>
   ),
   date: '2021-01-24',
@@ -102,12 +107,3 @@ const isBlockedFromBottom = (simulated, activeShape, playerShapes) => {
 But how do we know that the change we made didn't affect any other scenarios which used to work until now? or if it affected any other parts of the app? or if it drastically slowed down the app?
 
 This is one of the reasons why we need a proper set of tests for the app. Although it may seem like writing tests slows down development it usually pays off pretty fast.
-
-## Did it work?
-
-You can try the updated game here (Instructions: use arrow keys and WASD keys)
-
-<LazyIframe
-  src="/blog/2021-01-24-multiplayer-tetris-game-part-2/embed/finished"
-  height="400px"
-/>
