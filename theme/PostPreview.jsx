@@ -21,7 +21,7 @@ export const DefaultPostPreview = ({ link, meta }) => (
         <Link href={'/blog' + link}>{meta.title}</Link>
       </h2>
     </header>
-    <main>{meta.intro}</main>
+    <main>{meta.description}</main>
   </article>
 )
 
