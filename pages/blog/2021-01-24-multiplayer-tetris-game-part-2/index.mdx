@@ -1,26 +1,29 @@
-import { createPostContent } from 'theme/PostContent';
-import { LazyIframe } from 'theme/elements/LazyIframe';
+import { createPostContent } from "theme/PostContent";
+import { LazyIframe } from "theme/elements/LazyIframe";
 
 export const meta = {
-  title: 'Multiplayer Tetris Game (part 2)',
+  title: "Multiplayer Tetris Game (part 2)",
   description:
-    'This tutorial validates the design we used to write code on part 1. We will try whether it\'s possible to fix bugs easily and whether we can add some new features to the game without major code/design changes.',
+    "This tutorial validates the design we used to write code on part 1. We will try whether it's possible to fix bugs easily and whether we can add some new features to the game without major code/design changes.",
   intro: (
     <section>
       <p>
-        This tutorial validates the design we used to write code on part 1. We will
-        try whether it's possible to fix bugs easily and whether we can add some new
-        features to the game without major code/design changes.
+        This tutorial validates the design we used to write code on part 1. We
+        will try whether it's possible to fix bugs easily and whether we can add
+        some new features to the game without major code/design changes.
       </p>
-      <p>Did it work? uou can try the updated game here (Instructions: click to focus and use ↑←↓→ keys and WASD keys)</p>
+      <p>
+        Did it work? uou can try the updated game here (Instructions: click to
+        focus and use ↑←↓→ keys and WASD keys)
+      </p>
       <LazyIframe
         src="/blog/2021-01-24-multiplayer-tetris-game-part-2/embed/finished"
         height="400px"
       />
     </section>
   ),
-  date: '2021-01-24',
-  tags: ['js'],
+  date: "2021-01-24",
+  tags: ["js"],
 };
 
 export default createPostContent({ meta });
@@ -29,11 +32,11 @@ export default createPostContent({ meta });
 
 It turns out, the "T" shape passes through other shapes unless the block on the bottom touches. Let's have a look at one of the requirements we started with on part 1.
 
-- R2.3: The active shape moves 1 unit downwards every 0.5 seconds until *it lands* on the floor or on another shape.
+- R2.3: The active shape moves 1 unit downwards every 0.5 seconds until _it lands_ on the floor or on another shape.
 
 Let's define the requirement better.
 
-- R2.3: The active shape moves 1 unit downwards every 0.5 seconds until *any of the blocks in the active shape lands* on the floor or on another shape.
+- R2.3: The active shape moves 1 unit downwards every 0.5 seconds until _any of the blocks in the active shape lands_ on the floor or on another shape.
 
 Here's the code that is supposed to handle this scenario.
 
@@ -96,7 +99,7 @@ const isBlockedFromBottom = (simulated, activeShape, playerShapes) => {
             return RULE_ACTIONS.CREATE_SHAPE;
           }
         }
-        prevVal = val
+        prevVal = val;
       }
     }
   }

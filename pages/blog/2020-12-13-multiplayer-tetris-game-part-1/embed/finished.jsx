@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect } from "react";
 
 const SHAPE_TYPES = [
   [
@@ -13,9 +13,7 @@ const SHAPE_TYPES = [
     [0, 1, 0],
     [1, 1, 1],
   ],
-  [
-    [1, 1, 1],
-  ],
+  [[1, 1, 1]],
 ];
 
 const ACTION_TYPES = {
@@ -58,15 +56,15 @@ const startPlayer = (keymap, listener) => {
       }
     }
   };
-  document.addEventListener('keydown', keyDownListener);
+  document.addEventListener("keydown", keyDownListener);
 
   return () => {
-    document.removeEventListener('keydown', keyDownListener);
+    document.removeEventListener("keydown", keyDownListener);
   };
 };
 
 const startWorld = (keymaps, renderer, ticker, ruleset, options) => {
-  const PLAYER_COLORS = ['#6fa8dc', '#f6b26b'];
+  const PLAYER_COLORS = ["#6fa8dc", "#f6b26b"];
   const playersCount = keymaps.length;
   const playerShapes = [];
   const stopPlayerFns = [];
@@ -75,7 +73,7 @@ const startWorld = (keymaps, renderer, ticker, ruleset, options) => {
   };
   const createNewShape = (i) => {
     const index = Math.floor(Math.random() * SHAPE_TYPES.length);
-    const shape = { x: 0, y: 0, type: SHAPE_TYPES[index], color: '#111' };
+    const shape = { x: 0, y: 0, type: SHAPE_TYPES[index], color: "#111" };
     shape.x = Math.floor((options.worldWidth / playersCount / 2) * (i * 2 + 1));
     shape.y = -shape.type.length;
     shape.color = PLAYER_COLORS[i % PLAYER_COLORS.length];
@@ -95,7 +93,7 @@ const startWorld = (keymaps, renderer, ticker, ruleset, options) => {
         createNewShape(i);
         return;
       } else if (result === RULE_ACTIONS.END_THE_GAME) {
-        alert('GAME OVER!');
+        alert("GAME OVER!");
         stopWorld();
       }
     }
@@ -129,11 +127,11 @@ const createRenderer = (canvas, options) => {
   const canvasHeight = options.worldHeight * options.worldScale;
   canvas.width = canvasWidth;
   canvas.height = canvasHeight;
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext("2d");
 
   const renderBlock = (x, y, color) => {
     ctx.fillStyle = color;
-    ctx.strokeStyle = '#000';
+    ctx.strokeStyle = "#000";
     ctx.fillRect(
       x * options.worldScale,
       y * options.worldScale,
@@ -328,8 +326,8 @@ export default function GameDemo() {
   }, [canvasRef]);
 
   return (
-    <div style={{ position: 'absolute', top: 0, left: 0, width: '100%' }}>
-      <canvas ref={canvasRef} style={{ display: 'block', margin: '0 auto'}} />
+    <div style={{ position: "absolute", top: 0, left: 0, width: "100%" }}>
+      <canvas ref={canvasRef} style={{ display: "block", margin: "0 auto" }} />
     </div>
   );
 }

@@ -1,11 +1,11 @@
-import { createPostContent } from 'theme/PostContent';
-import { LazyIframe } from 'theme/elements/LazyIframe';
-import img1 from './images/basic-components.png';
+import { createPostContent } from "theme/PostContent";
+import { LazyIframe } from "theme/elements/LazyIframe";
+import img1 from "./images/basic-components.png";
 
 export const meta = {
-  title: 'Multiplayer Tetris Game (part 1)',
+  title: "Multiplayer Tetris Game (part 1)",
   description:
-    'A tutorial about writing a multiplayer game from scratch. Starting from solidifying the requirements and continues all the way up to creating a working prototype with vanilla js.',
+    "A tutorial about writing a multiplayer game from scratch. Starting from solidifying the requirements and continues all the way up to creating a working prototype with vanilla js.",
   intro: (
     <section>
       <p>
@@ -15,8 +15,8 @@ export const meta = {
       </p>
     </section>
   ),
-  date: '2020-12-13',
-  tags: ['js'],
+  date: "2020-12-13",
+  tags: ["js"],
 };
 
 export default createPostContent({ meta });
@@ -171,7 +171,7 @@ Next we need some way to filter player actions. Given a player action the rule s
 
 ```ts
 // TODO: would probably need more information to decide the outcome
-type GameRule = (action: PlayerAction) => 'apply' | 'dont_apply';
+type GameRule = (action: PlayerAction) => "apply" | "dont_apply";
 ```
 
 #### The Game Renderer
@@ -201,10 +201,10 @@ const startPlayer = (keymap, listener) => {
       }
     }
   };
-  document.addEventListener('keydown', keyDownListener);
+  document.addEventListener("keydown", keyDownListener);
 
   return () => {
-    document.removeEventListener('keydown', keyDownListener);
+    document.removeEventListener("keydown", keyDownListener);
   };
 };
 ```
@@ -215,7 +215,7 @@ We also added an options object which we can use to configure the game world. Ri
 
 ```js
 const startWorld = (keymaps, renderer, options) => {
-  const PLAYER_COLORS = ['#6fa8dc', '#f6b26b'];
+  const PLAYER_COLORS = ["#6fa8dc", "#f6b26b"];
   const playersCount = keymaps.length;
   const playerShapes = [];
   const stopPlayerFns = [];
@@ -224,7 +224,7 @@ const startWorld = (keymaps, renderer, options) => {
   };
   const createNewShape = (i) => {
     const index = Math.floor(Math.random() * SHAPE_TYPES.length);
-    const shape = { x: 0, y: 0, type: SHAPE_TYPES[index], color: '#111' };
+    const shape = { x: 0, y: 0, type: SHAPE_TYPES[index], color: "#111" };
     shape.x = Math.floor((options.worldWidth / playersCount / 2) * (i * 2 + 1));
     shape.color = PLAYER_COLORS[i % PLAYER_COLORS];
     playerShapes[i].unshift(shape);
@@ -262,7 +262,7 @@ Let's see how it works with a test renderer.
 
 ```js
 const renderer = (shapes) => {
-  console.log('render:');
+  console.log("render:");
   console.log(JSON.stringify(shapes[0]));
   console.log(JSON.stringify(shapes[1]));
 };
@@ -284,11 +284,11 @@ const createRenderer = (canvas, options) => {
   const canvasHeight = options.worldHeight * options.worldScale;
   canvas.width = canvasWidth;
   canvas.height = canvasHeight;
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext("2d");
 
   const renderBlock = (x, y, color) => {
     ctx.fillStyle = color;
-    ctx.strokeStyle = '#000';
+    ctx.strokeStyle = "#000";
     ctx.fillRect(
       x * options.worldScale,
       y * options.worldScale,
@@ -378,7 +378,7 @@ const startWorld = (keymaps, renderer, ticker, ruleset, options) => {
         createNewShape(i);
         return;
       } else if (result === RULE_ACTIONS.END_THE_GAME) {
-        alert('GAME OVER!');
+        alert("GAME OVER!");
         stopWorld();
       }
     }

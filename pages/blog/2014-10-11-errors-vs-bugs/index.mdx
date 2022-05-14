@@ -1,36 +1,41 @@
-
-import { createPostContent } from 'theme/PostContent';
-
+import { createPostContent } from "theme/PostContent";
 
 export const meta = {
   title: "Errors vs. Bugs",
-  description: "One of the most important things I learned during past few months at  MeteorHacks is the difference between errors and bugs and how they  should be handled. I also found this [awesome article](https://www.joyent.com/developers/node/design/errors) on Joyent website which talks about error handling in node.",
+  description:
+    "One of the most important things I learned during past few months at  MeteorHacks is the difference between errors and bugs and how they  should be handled. I also found this [awesome article](https://www.joyent.com/developers/node/design/errors) on Joyent website which talks about error handling in node.",
   intro: (
     <section>
-      <p>One of the most important things I learned during past few months at  MeteorHacks is the difference between errors and bugs and how they  should be handled. I also found this [awesome article](https://www.joyent.com/developers/node/design/errors) on Joyent website which talks about error handling in node.</p>
+      <p>
+        One of the most important things I learned during past few months at
+        MeteorHacks is the difference between errors and bugs and how they
+        should be handled. I also found this [awesome
+        article](https://www.joyent.com/developers/node/design/errors) on Joyent
+        website which talks about error handling in node.
+      </p>
     </section>
   ),
   date: "2014-10-11",
-  tags: ["js","errors"],
+  tags: ["js", "errors"],
 };
 
 export default createPostContent({ meta });
 
-One of the most important things I learned during past few months at  MeteorHacks is the difference between errors and bugs and how they  should be handled. I also found this [awesome article](https://www.joyent.com/developers/node/design/errors) on Joyent website which talks about error handling in node.
+One of the most important things I learned during past few months at MeteorHacks is the difference between errors and bugs and how they should be handled. I also found this [awesome article](https://www.joyent.com/developers/node/design/errors) on Joyent website which talks about error handling in node.
 
-Errors can stop your program from working but the program can't fix  it (s.a. losing network connection). The program should be prepared to  handle these events or you're going to say "It works on my computer" a  lot. The program must at the least let the user know that an error has  occurred and how to fix it if they can. Also in most cases it'll be  great if we can keep at least some parts of the application running.
+Errors can stop your program from working but the program can't fix it (s.a. losing network connection). The program should be prepared to handle these events or you're going to say "It works on my computer" a lot. The program must at the least let the user know that an error has occurred and how to fix it if they can. Also in most cases it'll be great if we can keep at least some parts of the application running.
 
-Bugs are mistakes made by the programmer (or Loki who likes messing  our code when we're not watching). The program should never expect or  try to handle bugs automatically. When developing, it's usually best to  let the program crash so you can identify and fix the bug as early as  possible. Here are some examples for a few different kinds of bugs.
+Bugs are mistakes made by the programmer (or Loki who likes messing our code when we're not watching). The program should never expect or try to handle bugs automatically. When developing, it's usually best to let the program crash so you can identify and fix the bug as early as possible. Here are some examples for a few different kinds of bugs.
 
 ```js
 // syntax
-console,log('hello world')
+console, log("hello world");
 
 // typos
-konsole.log('hello world')
+konsole.log("hello world");
 
 // logical
 var square = number * 2;
 ```
 
-This might sound pretty dumb but I found this really important. I  learned this the hard way and I'm always going to keep this in mind when  I code.
+This might sound pretty dumb but I found this really important. I learned this the hard way and I'm always going to keep this in mind when I code.

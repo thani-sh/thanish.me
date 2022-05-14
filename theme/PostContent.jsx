@@ -1,5 +1,5 @@
-import Head from 'next/head';
-import { PageHeader } from './elements/PageHeader';
+import Head from "next/head";
+import { PageHeader } from "./elements/PageHeader";
 
 export const PostContent = ({ meta, children }) => (
   <article>
@@ -19,6 +19,7 @@ export const PostContent = ({ meta, children }) => (
   </article>
 );
 
-export const createPostContent = ({ meta }) => ({ children }) => (
-  <PostContent meta={meta}>{children}</PostContent>
-);
+export const createPostContent =
+  ({ meta }) =>
+  ({ children }) =>
+    <PostContent meta={meta}>{children}</PostContent>;

@@ -1,13 +1,16 @@
-
-import { createPostContent } from 'theme/PostContent';
-
+import { createPostContent } from "theme/PostContent";
 
 export const meta = {
   title: "Day 2: Built-in Features",
-  description: "This tutorial consists of a number of example go programs demonstrating each feature. It is recommended to try some of them on the Go playground or on your local machine.",
+  description:
+    "This tutorial consists of a number of example go programs demonstrating each feature. It is recommended to try some of them on the Go playground or on your local machine.",
   intro: (
     <section>
-      <p>This tutorial consists of a number of example go programs demonstrating each feature. It is recommended to try some of them on the Go playground or on your local machine.</p>
+      <p>
+        This tutorial consists of a number of example go programs demonstrating
+        each feature. It is recommended to try some of them on the Go playground
+        or on your local machine.
+      </p>
     </section>
   ),
   date: "2015-07-28",
@@ -50,7 +53,7 @@ func main() {
 
 The first 2 lines in the function can be shortened with the “:=” operator. This will attempt to identify the type form the value and use it. In most cases this will work as expected but when using numbers, it will always use **int** for integers and **float64** for floating point numbers. When writing Go programs, the := operator is preferred more than declaring with **var** and assigning later.
 
-Please note that all variables created must be used in the program otherwise it’ll give an error when running/compiling. In some cases the “_” can be used in place of a variable.
+Please note that all variables created must be used in the program otherwise it’ll give an error when running/compiling. In some cases the “\_” can be used in place of a variable.
 
 Go has many more data types which can be read from the [go specification](https://golang.org/ref/spec#Types). The go spec is shorter than most others and also very easy to read and understand.
 
@@ -386,7 +389,7 @@ func main() {
 		"Gohan": "Saiyan",
 		"Dende": "Namekian",
 	}
-	
+
 	t4s := t3s
 	t4s["Vegeta"] = "Saiyan"
 
@@ -426,7 +429,7 @@ func main() {
 		name string
 		race string
 	}
-	
+
 	krillin := member{}
 	krillin.name = "Krillin"
 	krillin.race = "Human"

@@ -1,18 +1,21 @@
-
-import { createPostContent } from 'theme/PostContent';
-import img1 from './images/1-D2GJjRg5Ss_4KcskGrmN-Q.png';
-import img2 from './images/1-cwXIknjf3--tjO2QSSo3MQ.png';
+import { createPostContent } from "theme/PostContent";
+import img1 from "./images/1-D2GJjRg5Ss_4KcskGrmN-Q.png";
+import img2 from "./images/1-cwXIknjf3--tjO2QSSo3MQ.png";
 
 export const meta = {
   title: "Duplicate click events",
-  description: "While trying to debug this issue, we found out a couple of interesting things about how Angular manages event handlers.",
+  description:
+    "While trying to debug this issue, we found out a couple of interesting things about how Angular manages event handlers.",
   intro: (
     <section>
-      <p>While trying to debug this issue, we found out a couple of interesting things about how Angular manages event handlers.</p>
+      <p>
+        While trying to debug this issue, we found out a couple of interesting
+        things about how Angular manages event handlers.
+      </p>
     </section>
   ),
   date: "2017-06-27",
-  tags: ["js","angular"],
+  tags: ["js", "angular"],
 };
 
 export default createPostContent({ meta });
@@ -58,7 +61,10 @@ When we ran the app with a similar code, the “TestButtonComponent: clicked!”
 
 Let’s add a breakpoint on the AppComponent click event handler.
 
-<img src={img1} alt="Screenshot taken during the second click event emit with the stack trace" />
+<img
+  src={img1}
+  alt="Screenshot taken during the second click event emit with the stack trace"
+/>
 
 If we analyze [stack traces](https://github.com/mnmtanish/test-ng-event) on the event handler, we can see that the events are originating from different sources.
 
@@ -73,7 +79,10 @@ The second event on the other hand is created from a DOM event on the component 
 
 Angular will use the DomEventsPlugin for ALL event names if no other plugins support that event. This means that all custom events used throughout the app also has event listeners on the DOM with that name on each component. This can be confirmed using Chrome developer tools.
 
-<img src={img2} alt="Screenshot of the list of event listeners on the app-test-button element" />
+<img
+  src={img2}
+  alt="Screenshot of the list of event listeners on the app-test-button element"
+/>
 
 It requires more experiments to check the performance impact on the app caused because of this approach. But the point I like to emphasize here is that when using events in Angular, it is important to be aware of this in order to avoid any unexpected behavior.
 

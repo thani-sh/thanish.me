@@ -1,13 +1,16 @@
-
-import { createPostContent } from 'theme/PostContent';
-
+import { createPostContent } from "theme/PostContent";
 
 export const meta = {
   title: "‘Hello World’ to MeteorJS",
-  description: "In this tutorial, I’ll try to walk you through building a simple  realtime wall (like a guestbook) where anyone can post messages. And  let’s try to do this without using any magic.",
+  description:
+    "In this tutorial, I’ll try to walk you through building a simple  realtime wall (like a guestbook) where anyone can post messages. And  let’s try to do this without using any magic.",
   intro: (
     <section>
-      <p>In this tutorial, I’ll try to walk you through building a simple  realtime wall (like a guestbook) where anyone can post messages. And  let’s try to do this without using any magic.</p>
+      <p>
+        In this tutorial, I’ll try to walk you through building a simple
+        realtime wall (like a guestbook) where anyone can post messages. And
+        let’s try to do this without using any magic.
+      </p>
     </section>
   ),
   date: "2014-05-02",
@@ -16,12 +19,12 @@ export const meta = {
 
 export default createPostContent({ meta });
 
-In this tutorial, I’ll try to walk you through building a simple  realtime wall (like a guestbook) where anyone can post messages. And  let’s try to do this without using any magic.
+In this tutorial, I’ll try to walk you through building a simple realtime wall (like a guestbook) where anyone can post messages. And let’s try to do this without using any magic.
 
 ### Install Meteor and Atmosphere
 
-* Installing Meteor
-* Installing Atmosphere
+- Installing Meteor
+- Installing Atmosphere
 
 ### Create new project
 
@@ -32,7 +35,7 @@ meteor create the-wall
 
 ```
 
-Feel free to run the meteor app although we haven’t even started  coding it yet. It’s okay to keep it running even while you’re coding.
+Feel free to run the meteor app although we haven’t even started coding it yet. It’s okay to keep it running even while you’re coding.
 
 ```
 cd the-wall
@@ -52,7 +55,7 @@ meteor remove autopublish
 
 ### Create a collection
 
-In meteor, we’ll be keeping most of our realtime data in collections. Create a new file `posts/collections/posts.js`.  This will make this collection available in both the server and the  client. And we want to let anyone post messages and make sure no one can  delete them.
+In meteor, we’ll be keeping most of our realtime data in collections. Create a new file `posts/collections/posts.js`. This will make this collection available in both the server and the client. And we want to let anyone post messages and make sure no one can delete them.
 
 posts/collections/posts.js
 
@@ -68,7 +71,7 @@ Posts.allow({
 
 ### Publish the collection
 
-Data collections must be first published before they can be accessed  by clients. For our example, let’s publish posts which posted in last 24  hours.
+Data collections must be first published before they can be accessed by clients. For our example, let’s publish posts which posted in last 24 hours.
 
 posts/server/publications/latestPosts.js
 
@@ -98,7 +101,7 @@ Posts.insert({text: "Now", created: now});
 
 ### Subscribe and fetch posts
 
-If you try fetching them from the database, it won’t work because  first we must subscribe to a publication. If you try to fetch anyways,  it’ll return an empty array.
+If you try fetching them from the database, it won’t work because first we must subscribe to a publication. If you try to fetch anyways, it’ll return an empty array.
 
 ```
 Posts.find().fetch()
@@ -113,7 +116,7 @@ var sub = Meteor.subscribe('latestPosts');
 
 ```
 
-After some time, the subscription will be ready. You can check it  using the ready method of the object returned by Meteor.subscribe().
+After some time, the subscription will be ready. You can check it using the ready method of the object returned by Meteor.subscribe().
 
 ```
 sub.ready()
@@ -129,11 +132,11 @@ Posts.find().fetch().toString()
 
 ```
 
-You’ll notice that although there are 3 docs in the collection, only 2  gets to the client through this publication/subscription. This happens  because we have limited docs sent to the client when publishing them.
+You’ll notice that although there are 3 docs in the collection, only 2 gets to the client through this publication/subscription. This happens because we have limited docs sent to the client when publishing them.
 
 ### Method to add posts
 
-Earlier we added posts from the client side and we set the created  time manually. To make things simpler, we can create a Meteor method  which does this for us.
+Earlier we added posts from the client side and we set the created time manually. To make things simpler, we can create a Meteor method which does this for us.
 
 posts/server/methods/saveMethod.js
 

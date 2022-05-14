@@ -1,9 +1,9 @@
-const r = require.context('../../pages/blog/', true, /\.mdx$/);
+const r = require.context("../../pages/blog/", true, /\.mdx$/);
 
 export const posts = r
   .keys()
   .map((fileName) => {
-    const link = fileName.substr(1).replace(/\/index\.mdx$/, '');
+    const link = fileName.substr(1).replace(/\/index\.mdx$/, "");
     const meta = { ...r(fileName).meta, link };
     return { link, meta };
   })

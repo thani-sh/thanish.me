@@ -1,13 +1,16 @@
-
-import { createPostContent } from 'theme/PostContent';
-
+import { createPostContent } from "theme/PostContent";
 
 export const meta = {
   title: "Solving Interview Problems",
-  description: "Sometimes, we get to solve programming questions on site during software engineering interviews. This is one of the questions I used to ask from those who have applied for software engineering positions at Creately.",
+  description:
+    "Sometimes, we get to solve programming questions on site during software engineering interviews. This is one of the questions I used to ask from those who have applied for software engineering positions at Creately.",
   intro: (
     <section>
-      <p>Sometimes, we get to solve programming questions on site during software engineering interviews. This is one of the questions I used to ask from those who have applied for software engineering positions at Creately.</p>
+      <p>
+        Sometimes, we get to solve programming questions on site during software
+        engineering interviews. This is one of the questions I used to ask from
+        those who have applied for software engineering positions at Creately.
+      </p>
     </section>
   ),
   date: "2019-02-05",
@@ -22,8 +25,8 @@ _A number of train engines are moving towards a common destination on the same t
 
 ```js
 const trains = [
-    { id: 't1', distance: 1200, maxSpeed: 10 },
-    // ...
+  { id: "t1", distance: 1200, maxSpeed: 10 },
+  // ...
 ];
 ```
 
@@ -55,30 +58,30 @@ The second part is where the applicant and the interviewer will have a discussio
 
 ```js
 const trains = [
-    { id: 't1', distance: 10, maxSpeed: 10 },
-    { id: 't2', distance: 51, maxSpeed: 10 },
-    { id: 't3', distance: 50, maxSpeed: 5 },
-    { id: 't4', distance: 150, maxSpeed: 5 },
+  { id: "t1", distance: 10, maxSpeed: 10 },
+  { id: "t2", distance: 51, maxSpeed: 10 },
+  { id: "t3", distance: 50, maxSpeed: 5 },
+  { id: "t4", distance: 150, maxSpeed: 5 },
 ];
 
 // sort by the distance from the destination
-trains.sort((a, b) => a.distance - b.distance)
+trains.sort((a, b) => a.distance - b.distance);
 
 for (let i = 0; i < trains.length; ++i) {
-    const train = trains[i];
-    // duration if there are no other trains in front
-    train.duration = train.distance / train.maxSpeed;
-    if (i > 0) {
-        // "prevs" is in front of "train"
-        const prevs = trains[i - 1];
-        // train.duration must be >= prevs.duration
-        if (prevs.duration > train.duration) {
-            train.duration = prevs.duration;
-        }
+  const train = trains[i];
+  // duration if there are no other trains in front
+  train.duration = train.distance / train.maxSpeed;
+  if (i > 0) {
+    // "prevs" is in front of "train"
+    const prevs = trains[i - 1];
+    // train.duration must be >= prevs.duration
+    if (prevs.duration > train.duration) {
+      train.duration = prevs.duration;
     }
+  }
 }
 
-console.log(trains)
+console.log(trains);
 ```
 
 In real world, the above example can cause create some issues. Let me know if you have figured them out.

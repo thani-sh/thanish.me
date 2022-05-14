@@ -1,7 +1,7 @@
-import Head from 'next/head';
-import { PostPreview } from 'theme/PostPreview';
-import { PageHeader } from 'theme/elements/PageHeader';
-import { posts } from 'theme/scripts/get-all-posts';
+import Head from "next/head";
+import { PostPreview } from "theme/PostPreview";
+import { PageHeader } from "theme/elements/PageHeader";
+import { posts } from "theme/scripts/get-all-posts";
 
 export default function Homepage() {
   const latest = posts[0];

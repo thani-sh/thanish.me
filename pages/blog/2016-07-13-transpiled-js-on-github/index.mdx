@@ -1,17 +1,21 @@
-
-import { createPostContent } from 'theme/PostContent';
-
+import { createPostContent } from "theme/PostContent";
 
 export const meta = {
   title: "Transpiled JS on Github?",
-  description: "If you’re maintaining a javascript project on Github there’s a good chance you’re using a transpiler. Most developers don’t publish transpiled code to Github because it makes your pull requests look messed up and it’s difficult to keep source and transpiled code in sync.",
+  description:
+    "If you’re maintaining a javascript project on Github there’s a good chance you’re using a transpiler. Most developers don’t publish transpiled code to Github because it makes your pull requests look messed up and it’s difficult to keep source and transpiled code in sync.",
   intro: (
     <section>
-      <p>If you’re maintaining a javascript project on Github there’s a good chance you’re using a transpiler. Most developers don’t publish transpiled code to Github because it makes your pull requests look messed up and it’s difficult to keep source and transpiled code in sync.</p>
+      <p>
+        If you’re maintaining a javascript project on Github there’s a good
+        chance you’re using a transpiler. Most developers don’t publish
+        transpiled code to Github because it makes your pull requests look
+        messed up and it’s difficult to keep source and transpiled code in sync.
+      </p>
     </section>
   ),
   date: "2016-07-13",
-  tags: ["github","js"],
+  tags: ["github", "js"],
 };
 
 export default createPostContent({ meta });

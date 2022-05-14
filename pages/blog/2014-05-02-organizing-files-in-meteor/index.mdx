@@ -1,13 +1,17 @@
-
-import { createPostContent } from 'theme/PostContent';
-
+import { createPostContent } from "theme/PostContent";
 
 export const meta = {
   title: "Organizing files in Meteor",
-  description: "Starting hacking on a project with Meteor is lots of fun. But things  can become a mess very easily. Meteor does not have too much  restrictions on how to organize our project files but it’ll be useful to  know some of its ways.",
+  description:
+    "Starting hacking on a project with Meteor is lots of fun. But things  can become a mess very easily. Meteor does not have too much  restrictions on how to organize our project files but it’ll be useful to  know some of its ways.",
   intro: (
     <section>
-      <p>Starting hacking on a project with Meteor is lots of fun. But things  can become a mess very easily. Meteor does not have too much  restrictions on how to organize our project files but it’ll be useful to  know some of its ways.</p>
+      <p>
+        Starting hacking on a project with Meteor is lots of fun. But things can
+        become a mess very easily. Meteor does not have too much restrictions on
+        how to organize our project files but it’ll be useful to know some of
+        its ways.
+      </p>
     </section>
   ),
   date: "2014-05-02",
@@ -16,15 +20,15 @@ export const meta = {
 
 export default createPostContent({ meta });
 
-Starting hacking on a project with Meteor is lots of fun. But things  can become a mess very easily. Meteor does not have too much  restrictions on how to organize our project files but it’ll be useful to  know some of its ways.
+Starting hacking on a project with Meteor is lots of fun. But things can become a mess very easily. Meteor does not have too much restrictions on how to organize our project files but it’ll be useful to know some of its ways.
 
 ### “packages” directory
 
-This is where all `meteor` and `atmosphere` packages are stored. And it’s a good place to store your own packages.  If your projects contain any parts which does not change often and  mostly independent from the rest of your project, you can create a  package for that.
+This is where all `meteor` and `atmosphere` packages are stored. And it’s a good place to store your own packages. If your projects contain any parts which does not change often and mostly independent from the rest of your project, you can create a package for that.
 
-Another advantage of using packages is _namespacing_. Global  variables you create inside packages are only available inside the  package. Variables must be manually exported to other parts of your  application using the package.json file.
+Another advantage of using packages is _namespacing_. Global variables you create inside packages are only available inside the package. Variables must be manually exported to other parts of your application using the package.json file.
 
-_If you’re writing packages, also try testing them using tinytest.  It’s really easy to test with tinytest and it comes with Meteor by  default._
+_If you’re writing packages, also try testing them using tinytest. It’s really easy to test with tinytest and it comes with Meteor by default._
 
 ### “client” and “server” directories
 
@@ -73,11 +77,11 @@ And the most important thing is that you can use `client` and `server` inside ot
 
 In above example, the project contains 3 modules blog, user and search.
 
-* Search module only has a Meteor method so it needs files to run only on server.
-* User module can have both client side and server side code.
-* Blog module has two sub modules posts and gallery.
-* Gallery sub module only has client side code.
-* Posts sub-module has both client and server side code.
-* Posts sub-module also has a file common to both server and client.
+- Search module only has a Meteor method so it needs files to run only on server.
+- User module can have both client side and server side code.
+- Blog module has two sub modules posts and gallery.
+- Gallery sub module only has client side code.
+- Posts sub-module has both client and server side code.
+- Posts sub-module also has a file common to both server and client.
 
 Original Post: [https://mnmtanish.svbtle.com/organizing-files-in-meteor](https://mnmtanish.svbtle.com/organizing-files-in-meteor)

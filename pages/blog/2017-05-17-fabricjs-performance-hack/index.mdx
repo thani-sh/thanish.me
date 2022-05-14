@@ -1,19 +1,21 @@
-
-import { createPostContent } from 'theme/PostContent';
-import img1 from './images/1-I5nrwmWgIbaqEACsZFTMRA.png';
-import img2 from './images/1-h5PmFsdbKLTv1BXc8FUJsQ.png';
-import img3 from './images/1-3Wu64u6UyaUPH7NIxJtC6A.png';
+import { createPostContent } from "theme/PostContent";
+import img1 from "./images/1-I5nrwmWgIbaqEACsZFTMRA.png";
+import img2 from "./images/1-h5PmFsdbKLTv1BXc8FUJsQ.png";
+import img3 from "./images/1-3Wu64u6UyaUPH7NIxJtC6A.png";
 
 export const meta = {
   title: "FabricJS performance hack",
-  description: "The frame rate can be improved by only rendering inside a rAF callback.",
+  description:
+    "The frame rate can be improved by only rendering inside a rAF callback.",
   intro: (
     <section>
-      <p>The frame rate can be improved by only rendering inside a rAF callback.</p>
+      <p>
+        The frame rate can be improved by only rendering inside a rAF callback.
+      </p>
     </section>
   ),
   date: "2017-05-17",
-  tags: ["js","canvas"],
+  tags: ["js", "canvas"],
 };
 
 export default createPostContent({ meta });
@@ -25,23 +27,23 @@ let isRendering = false;
 let isAnimating = false;
 
 const render = canvas.renderAll.bind(canvas);
-const stop = () => isAnimating = false;
+const stop = () => (isAnimating = false);
 const play = () => {
-    isAnimating = true;
-    canvas.renderAll();
+  isAnimating = true;
+  canvas.renderAll();
 };
 
 canvas.renderAll = () => {
-    if (!isRendering) {
-        isRendering = true;
-        requestAnimationFrame(() => {
-            render();
-            isRendering = false;
-            if (isAnimating) {
-                canvas.renderAll();
-            }
-        });
-    }
+  if (!isRendering) {
+    isRendering = true;
+    requestAnimationFrame(() => {
+      render();
+      isRendering = false;
+      if (isAnimating) {
+        canvas.renderAll();
+      }
+    });
+  }
 };
 ```
 

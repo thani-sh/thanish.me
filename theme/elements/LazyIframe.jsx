@@ -1,19 +1,19 @@
-import { useState } from 'react';
+import { useState } from "react";
 
 const styles = {
   container: {
-    display: 'flex',
-    height: '600px',
-    border: 'dashed 1px #aaa',
-    margin: '16px 0',
+    display: "flex",
+    height: "600px",
+    border: "dashed 1px #aaa",
+    margin: "16px 0",
   },
   button: {
     flex: 1,
-    border: 'none',
-    background: 'none',
-    outline: 'none',
-    fontSize: '18px',
-    cursor: 'pointer',
+    border: "none",
+    background: "none",
+    outline: "none",
+    fontSize: "18px",
+    cursor: "pointer",
   },
 };
 
