@@ -1,0 +1,111 @@
+import { BlogPostLayout } from "../../../shared/templates-mdx/BlogPostLayout.jsx";
+import { GameIframe } from "./components/GameIframe";
+
+export const meta = {
+  title: "Multiplayer Tetris Game (part 2)",
+  description:
+    "This tutorial validates the design we used to write code on part 1. We will try whether it's possible to fix bugs easily and whether we can add some new features to the game without major code/design changes.",
+  intro: (
+    <section>
+      <p>
+        This tutorial validates the design we used to write code on part 1. We
+        will try whether it's possible to fix bugs easily and whether we can add
+        some new features to the game without major code/design changes.
+      </p>
+      <p>
+        Did it work? you can try the updated game here (Instructions: click to
+        focus and use ↑←↓→ keys and WASD keys)
+      </p>
+      <GameIframe
+        src="/blog/2021-01-24-multiplayer-tetris-game-part-2/embeds/finished"
+        height="400px"
+      />
+    </section>
+  ),
+  date: "2021-01-24",
+  tags: ["js"],
+  layout: BlogPostLayout,
+};
+
+## Fixing Bugs in the code
+
+It turns out, the "T" shape passes through other shapes unless the block on the bottom touches. Let's have a look at one of the requirements we started with on part 1.
+
+- R2.3: The active shape moves 1 unit downwards every 0.5 seconds until _it lands_ on the floor or on another shape.
+
+Let's define the requirement better.
+
+- R2.3: The active shape moves 1 unit downwards every 0.5 seconds until _any of the blocks in the active shape lands_ on the floor or on another shape.
+
+Here's the code that is supposed to handle this scenario.
+
+```js
+const isBlockedFromBottom = (simulated, activeShape, playerShapes) => {
+  if (simulated.type === activeShape.type && simulated.y <= activeShape.y) {
+    return null;
+  }
+  if (simulated.y + simulated.type.length > options.worldHeight) {
+    return RULE_ACTIONS.CREATE_SHAPE;
+  }
+  for (let [shape, isActive] of getOtherShapes(activeShape, playerShapes)) {
+    if (!doesBBoxOverlap(simulated, shape)) {
+      continue;
+    }
+    const row = simulated.type.length - 1;
+    for (let col = 0; col < simulated.type[0].length; ++col) {
+      if (doesBlockOverlap(simulated, row, col, shape)) {
+        if (simulated.y <= 0) {
+          return RULE_ACTIONS.END_THE_GAME;
+        }
+        if (isActive) {
+          return RULE_ACTIONS.BLOCK_ACTION;
+        }
+        return RULE_ACTIONS.CREATE_SHAPE;
+      }
+    }
+  }
+  return null;
+};
+```
+
+Instead of only checking the last row, we can check all the blocks with a bottom edge open.
+And here's the same code with the fix.
+
+```js
+const isBlockedFromBottom = (simulated, activeShape, playerShapes) => {
+  if (simulated.type === activeShape.type && simulated.y <= activeShape.y) {
+    return null;
+  }
+  if (simulated.y + simulated.type.length > options.worldHeight) {
+    return RULE_ACTIONS.CREATE_SHAPE;
+  }
+  for (let [shape, isActive] of getOtherShapes(activeShape, playerShapes)) {
+    if (!doesBBoxOverlap(simulated, shape)) {
+      continue;
+    }
+    for (let col = 0; col < simulated.type[0].length; ++col) {
+      let prevVal = 0;
+      for (let row = simulated.type.length - 1; row >= 0; --row) {
+        const val = simulated.type[row][col];
+        if (val && !prevVal) {
+          if (doesBlockOverlap(simulated, row, col, shape)) {
+            if (simulated.y <= 0) {
+              return RULE_ACTIONS.END_THE_GAME;
+            }
+            if (isActive) {
+              return RULE_ACTIONS.BLOCK_ACTION;
+            }
+            return RULE_ACTIONS.CREATE_SHAPE;
+          }
+        }
+        prevVal = val;
+      }
+    }
+  }
+  return null;
+};
+```
+
+But how do we know that the change we made didn't affect any other scenarios which used to work until now? or if it affected any other parts of the app? or if it drastically slowed down the app?
+
+This is one of the reasons why we need a proper set of tests for the app. Although it may seem like writing tests slows down development it usually pays off pretty fast.

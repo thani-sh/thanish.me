@@ -1,0 +1,46 @@
+import { BlogPostLayout } from "../../../shared/templates-mdx/BlogPostLayout.jsx";
+
+export const meta = {
+  title: "Using multiple GOPATHs",
+  description:
+    "For an example, if we set the GOPATH environment variable to _/tmp/go1:/tmp/go2:/tmp/go3_ all three of them will act as GOPATHs.",
+  intro: (
+    <section>
+      <p>
+        For an example, if we set the GOPATH environment variable to
+        _/tmp/go1:/tmp/go2:/tmp/go3_ all three of them will act as GOPATHs.
+      </p>
+    </section>
+  ),
+  date: "2016-01-18",
+  tags: ["go"],
+  layout: BlogPostLayout,
+};
+
+For an example, if we set the GOPATH environment variable to _/tmp/go1:/tmp/go2:/tmp/go3_ all three of them will act as GOPATHs.
+
+```
+GOPATH=/tmp/go1:/tmp/go2:/tmp/go3
+```
+
+But this raises a few questions.
+
+## How will this affect “go get”?
+
+To test this out, simply set the GOPATH, and try go getting a simple repository. You may run these commands if you like.
+
+```
+GOPATH=/tmp/go1:/tmp/go2:/tmp/go3
+go get github.com/deis/helloworld
+find /tmp/ | grep helloworld | head -1
+```
+
+It will be clear that packages downloaded using the go get command will end up in /tmp/go1 or the first directory in the set of GOPATHs
+
+## How will this affect imports?
+
+Go will look for packages in each of the paths given starting from the first. To test this out, I made this example repo and a script to run some tests. It's easier to test and understand how it works by running the shell script in the repo. If we consider the above example GOPATH, Go will first look in `/tmp/go1` then `/tmp/go2` and finally `/tmp/go3` until it finds the package. Check this [Github repository](https://github.com/mnmtanish/test-multiple-gopaths) for a demo.
+
+---
+
+So now that we can use multiple GOPATHs, is it useful? I personally think it would have been great if the import lookup order was in reverse order while maintaining current “go get” behaviour. If this happens, I can use 2 paths to separate actively developing projects and external dependencies.

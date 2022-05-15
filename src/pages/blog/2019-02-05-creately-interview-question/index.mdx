@@ -1,0 +1,86 @@
+import { BlogPostLayout } from "../../../shared/templates-mdx/BlogPostLayout.jsx";
+
+export const meta = {
+  title: "Solving Interview Problems",
+  description:
+    "Sometimes, we get to solve programming questions on site during software engineering interviews. This is one of the questions I used to ask from those who have applied for software engineering positions at Creately.",
+  intro: (
+    <section>
+      <p>
+        Sometimes, we get to solve programming questions on site during software
+        engineering interviews. This is one of the questions I used to ask from
+        those who have applied for software engineering positions at Creately.
+      </p>
+    </section>
+  ),
+  date: "2019-02-05",
+  tags: ["creately"],
+  layout: BlogPostLayout,
+};
+
+Sometimes, we get to solve programming questions on site during software engineering interviews. This is one of the questions I used to ask from those who have applied for software engineering positions at Creately.
+
+_A number of train engines are moving towards a common destination on the same track. Each train's maximum speed and distance from the destination is given as an array._
+
+```js
+const trains = [
+  { id: "t1", distance: 1200, maxSpeed: 10 },
+  // ...
+];
+```
+
+_Calculate how long will it take for each train to arrive at the destination._
+
+## Part 1: solving the problem
+
+First, we need to solve the problem within a time limit. An engineer from the company will assist you during this process.
+
+### Questions about the problem
+
+Applicants are expected to ask questions about the problem and clarify before starting to code. The interviewer will normally do their best to explain the problem to the applicant.
+
+### Using the internet/browser
+
+It is okay to look at documentation. We expect the applicant to look at relevant documentation when they need them instead of getting stuck. And it is absolutely okay to search "how to sort numbers in javascript" or anything like that.
+
+### Using third party modules
+
+If lodash or any other publicly available module can help you solve the problem faster, please go ahead and use them. But we expect them to have a clear idea about what the tool/function does.
+
+Other than the above, try to explain what's on your mind when you're trying to solve the problem. Be honest and listen to what the interviewer is saying, they're probably trying to help you solve the problem.
+
+## Part 2: discussing the solution
+
+The second part is where the applicant and the interviewer will have a discussion about the solution. The interviewer ask questions to see how well the applicant understands the question and the solution. This part is probably more important than solving the problem.
+
+### Example Solution:
+
+```js
+const trains = [
+  { id: "t1", distance: 10, maxSpeed: 10 },
+  { id: "t2", distance: 51, maxSpeed: 10 },
+  { id: "t3", distance: 50, maxSpeed: 5 },
+  { id: "t4", distance: 150, maxSpeed: 5 },
+];
+
+// sort by the distance from the destination
+trains.sort((a, b) => a.distance - b.distance);
+
+for (let i = 0; i < trains.length; ++i) {
+  const train = trains[i];
+  // duration if there are no other trains in front
+  train.duration = train.distance / train.maxSpeed;
+  if (i > 0) {
+    // "prevs" is in front of "train"
+    const prevs = trains[i - 1];
+    // train.duration must be >= prevs.duration
+    if (prevs.duration > train.duration) {
+      train.duration = prevs.duration;
+    }
+  }
+}
+
+console.log(trains);
+```
+
+In real world, the above example can cause create some issues. Let me know if you have figured them out.

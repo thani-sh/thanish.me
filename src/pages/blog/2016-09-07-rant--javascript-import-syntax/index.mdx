@@ -1,0 +1,46 @@
+import { BlogPostLayout } from "../../../shared/templates-mdx/BlogPostLayout.jsx";
+
+export const meta = {
+  title: "Rant: JavaScript import syntax",
+  description:
+    "The import syntax on javascript looks damn ugly when many items from a module. Take this example piece of code form a typical GraphQL code:",
+  intro: (
+    <section>
+      <p>
+        The import syntax on javascript looks damn ugly when many items from a
+        module. Take this example piece of code form a typical GraphQL code:
+      </p>
+    </section>
+  ),
+  date: "2016-09-07",
+  tags: ["js"],
+  layout: BlogPostLayout,
+};
+
+The import syntax on javascript looks damn ugly when many items from a module. Take this example piece of code form a typical GraphQL code:
+
+```
+import {
+  GraphQLObjectType,
+  GraphQLString,
+  GraphQLNonNull,
+  GraphQLFloat,
+  GraphQLList,
+  GraphQLBoolean,
+} from 'graphql'
+```
+
+The most important part of the statement, the module gets overshadowed by the list of items we're importing from it. The module name would stand out more if we write it like this (_warning: fake code ahead_).
+
+```
+from 'graphql' import {
+  GraphQLObjectType,
+  GraphQLString,
+  GraphQLNonNull,
+  GraphQLFloat,
+  GraphQLList,
+  GraphQLBoolean,
+}
+```
+
+I'm not an expert in languages so if anyone knows why its done this way please let me know.

@@ -1,0 +1,216 @@
+import { BlogPostLayout } from "../../../shared/templates-mdx/BlogPostLayout.jsx";
+import { GameIframe } from "./components/GameIframe";
+
+export const meta = {
+  title: "Multiplayer Tetris Game (part 3)",
+  description:
+    "This tutorial continues where we left off on part 2. We will split the code into multiple files to make it easier to maintain and implement a few more game rules.",
+  intro: (
+    <section>
+      <p>
+        This tutorial continues where we left off on part 2. We will split the
+        code into multiple files to make it easier to maintain and implement a
+        few more game rules.
+      </p>
+      <p>
+        Did it work? you can try the updated game here (Instructions: click to
+        focus and use ↑←↓→ keys and WASD keys)
+      </p>
+      <GameIframe
+        src="/blog/2022-11-11-multiplayer-tetris-game-part-3/embeds/finished"
+        height="450px"
+      />
+    </section>
+  ),
+  date: "2022-11-11",
+  tags: ["js"],
+  layout: BlogPostLayout,
+};
+
+## Refactoring the code
+
+First of all, do we need to refactor the game code? why?
+
+I'm not against refactoring code but sometimes we get carried away optimizing the code without adding any value. So we should make it clear what we are planning to improve, why and we should justify the decision.
+
+I think this is a good time to introduce Architecture Decision Records (in short, ADRs) to this project. This is a good way to keep track of what we are going to change and even more important **why** we are making any changes. Which decisions should be written down is debatable and it should be decided by you and your team
+
+It is common to have ADR#01 as the decision to keep records of architecture decisions. Let's start with ADR#02.
+
+```md
+# 02. Use TypeScript as the language
+
+Date: 2022-11-11
+
+## Status
+
+Accepted
+
+## Context
+
+The entire game code is written on a single js file which is at the moment 333 lines of code.
+Since the game is not complete, this is expected to grow significantly.
+
+While writing this code, there were several type errors which were only discovered at runtime
+when the game crashed because of them.
+
+## Decision
+
+An ECMAScript proposal exists to add types to JavaScript but it could take years to get accepted.
+As of now, TypeScript is the most commonly used typed language which transpiles to JavaScript.
+
+- Translate all existing code to TypeScript and avoid using the `any` type.
+- Split the code into multiple typescript files and import code where needed.
+
+## Consequences
+
+- Having types should help detect type related bugs at build time.
+- Adding additional dependencies should increases maintenance work.
+- The code is no longer runnable as-is (need to be transpiled & bundled).
+```
+
+And one more ADR to simplify the renderer code:
+
+```md
+# 03. Use pixi.js for rendering
+
+Date: 2022-11-11
+
+## Status
+
+Accepted
+
+## Context
+
+The renderer used by the game is written using code which directly calls HTML Canvas APIs.
+The effort required to write code requried to render shapes can be significantly reduced
+by using a library.
+
+## Decision
+
+Use PixiJS which is a rendering library which can render shapes and text with a low overhead.
+
+## Consequences
+
+- Using a library forces us to work within the API given to us by the library.
+- Adding additional dependencies should increases maintenance work.
+```
+
+You can learn more about [ADRs here](https://adr.github.io/) and also [adr-tools](https://github.com/npryce/adr-tools) which is a nice tool to help write ADRs.
+
+## New Requirements, Yay!
+
+Let's add some more game rules and see if the code can keep up with the changes. To recap, these were our requirements we ahve been working with so far:
+
+**R1: it should be possible for multiple players to play the game**
+
+- R1.1: Players share the same keyboard and display to play this game
+- R1.2: At least 2 players should be able to play this game together
+
+**R2: it should support all the basic rules of a "Tetris like" game**
+
+- R2.1: Shapes should never overlap with other shapes in the game.
+- R2.2: There is an "active shape" per player which can be rotated or moved left, right and down by the player.
+- R2.3: The active shape moves 1 unit downwards every 0.5 seconds until any of the blocks in the active shape lands on the floor or on another shape.
+- R2.4: A new shape is added when the game starts and when the active shape can no longer move downwards.
+- R2.5: When a new shape is added, it becomes the active shape and the previous active shape becomes inactive.
+- R2.6: The game is over when the shapes reaches the game world ceiling.
+
+We're going to add a few more under R2.
+
+- R2.7: When a row is filled, it should be cleared. All blocks on top of cleared row should move downwards 1 unit every 0.5 seconds until they land on the floor or on another shape.
+- R2.8: The game should keep track of the number of rows cleared and this value should be shown to the player.
+
+## Clearing filled blocks
+
+You can find the code below. This wil be called every time any of the shapes in the game land somewhere.
+
+I'll not go into much detail about the code other than it took some coffee to write, I wrote it from start to finish in one go and it seems to be working 😅
+
+```js
+const increasePoints = () => {
+  clearedCount++;
+  options.renderer.updatePoints(clearedCount);
+};
+
+const clearLines = () => {
+  // Map to keep track of rows which have blocks on them.
+  const rows: {
+    [rowNumber: number]: {
+      // number of filled blocks on this row
+      counter: number,
+      // shapes which have blocks on this row
+      shapes: {
+        [shapeId: number]: {
+          shape: Shape,
+          shapeRow: number,
+        },
+      },
+    },
+  } = {};
+
+  // Iterate through shapes and fill in the above map.
+  // Identify blocks which need to be cleared
+  for (let pidx = 0; pidx < shapes.length; pidx++) {
+    for (let sidx = 1; sidx < shapes[pidx].length; sidx++) {
+      const shape = shapes[pidx][sidx];
+      for (let y = 0; y < shape.type.length; y++) {
+        for (let x = 0; x < shape.type[y].length; x++) {
+          const blockY = shape.posY + y;
+          const blockV = shape.type[y][x];
+          if (!blockV) {
+            continue;
+          }
+          if (!rows[blockY]) {
+            rows[blockY] = { counter: 0, shapes: {} };
+          }
+          rows[blockY].counter++;
+          if (!rows[blockY].shapes[shape.id]) {
+            rows[blockY].shapes[shape.id] = { shape, shapeRow: y };
+          }
+        }
+      }
+    }
+  }
+
+  // clear blocks from filled rows, remove empty shapes and
+  // trigger floating shapes to start moving again
+  for (let y in rows) {
+    const { counter, shapes } = rows[y];
+    if (counter < WORLD_W) {
+      // the row is not filled
+      continue;
+    }
+    for (let shapeId in shapes) {
+      const { shape, shapeRow } = shapes[shapeId];
+      shape.type[shapeRow] = [];
+    }
+  }
+  const deletedShapes: number[] = [];
+  for (let y in rows) {
+    const { counter, shapes } = rows[y];
+    if (counter < WORLD_W) {
+      continue;
+    }
+    increasePoints();
+    for (let shapeId in shapes) {
+      const { shape } = shapes[shapeId];
+      if (deletedShapes.indexOf(shape.id) >= 0) {
+        continue;
+      }
+      for (let i = 0; i < shape.type.length; i++) {
+        if (shape.type[i].length === 0) {
+          shape.type.splice(i, 1);
+          activate(shape.id);
+        }
+      }
+      if (!shape.type.length) {
+        delShape(shape.id);
+        deletedShapes.push(shape.id);
+      }
+    }
+  }
+};
+```
+
+This is not the optimal way to do this since it iterates through each and every blocks on the game world every time it needs to check whether a row is empty or not. We can re-visit this algorithm if we come across any performance issues.

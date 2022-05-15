@@ -1,0 +1,54 @@
+import { HomepageLayout } from "../shared/templates-mdx/HomepageLayout.jsx";
+
+export const meta = {
+  title: "Thanish.me",
+  description: "dd if=/dev/head of=/dev/blog",
+  layout: HomepageLayout,
+};
+
+export const LatestPostPreview = ({ path, meta }) => (
+  <article className="post-preview-latest">
+    <header>
+      <h2 className="post-head">
+        <a href={path}>{meta.title}</a>
+      </h2>
+      <p className="post-meta">
+        <small>Posted on {meta.date}</small>
+      </p>
+    </header>
+    <main>{meta.intro}</main>
+  </article>
+);
+
+export const DefaultPostPreview = ({ path, meta }) => (
+  <article className="post-preview-default">
+    <header>
+      <h2 className="post-head">
+        <a href={path}>{meta.title}</a>
+      </h2>
+      <p className="post-meta">
+        <small>Posted on {meta.date}</small>
+      </p>
+    </header>
+    <main>{meta.description}</main>
+  </article>
+);
+
+export const BlogPosts = ({ pages }) => {
+  const latest = pages[0];
+  const darest = pages.slice(1);
+  return (
+    <>
+      <div className="preview-latest">
+        <LatestPostPreview {...latest} />
+      </div>
+      <div className="preview-darest">
+        {darest.map((post, i) => (
+          <DefaultPostPreview key={`${i}`} {...post} />
+        ))}
+      </div>
+    </>
+  );
+};
+
+<BlogPosts pages={props.pages} />

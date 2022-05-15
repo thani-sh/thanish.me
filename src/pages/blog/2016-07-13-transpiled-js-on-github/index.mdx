@@ -1,0 +1,38 @@
+import { BlogPostLayout } from "../../../shared/templates-mdx/BlogPostLayout.jsx";
+
+export const meta = {
+  title: "Transpiled JS on Github?",
+  description:
+    "If you're maintaining a javascript project on Github there's a good chance you're using a transpiler. Most developers don't publish transpiled code to Github because it makes your pull requests look messed up and it's difficult to keep source and transpiled code in sync.",
+  intro: (
+    <section>
+      <p>
+        If you're maintaining a javascript project on Github there's a good
+        chance you're using a transpiler. Most developers don't publish
+        transpiled code to Github because it makes your pull requests look
+        messed up and it's difficult to keep source and transpiled code in sync.
+      </p>
+    </section>
+  ),
+  date: "2016-07-13",
+  tags: ["github", "js"],
+  layout: BlogPostLayout,
+};
+
+If you're maintaining a javascript project on Github there's a good chance you're using a transpiler. Most developers don't publish transpiled code to Github because it makes your pull requests look messed up and it's difficult to keep source and transpiled code in sync.
+
+### Why would anyone publish transpiled code anyways?
+
+For node modules, if transpiled code is available on Github, the module can be installed directly from Github. This can be useful for people who can't use npmjs for some reasons. If you wish to make your module available to them, then it should have transpiled code on Github.
+
+### Why is it “considered harmful” then?
+
+The problem most people don't recognize is that this **transpiled code is a good place to hide malicious code**. When there's an issue, developers often only check the _source_ code. If malware got merged into your project, it'll stay there at least for a small amount of time until the transpiled code gets replaced. Users can get attacked using this method if they use your module from Github or if they clone your repo and run transpiled code.
+
+IMO, the probability of someone running malware with this method is quite low but it does exist. If a hacker would want to inject malware into someone with this method, it must be timed precisely.
+
+### How to fix this issue then?
+
+One thing we can do is to add transpiled directories to the .gitignore files and update them only when doing a new release. Note: gitignored files can be added using the -f flag. And make sure you have all your node modules up to date and clean.
+
+Or better, use a CI server to do a release if it's possible.

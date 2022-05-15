@@ -1,0 +1,103 @@
+import { BlogPostLayout } from "../../../shared/templates-mdx/BlogPostLayout.jsx";
+
+export const meta = {
+  title: "Aggregation for Firebase",
+  description:
+    "Assume we need to create a realtime dashboard to show some summary  values. Usually, with Firebase, we'll have to get all data to the client  and process them there. But this can only work for small data sets. If  we have a few megabytes of data or more, this approach can get really  slow. And we must aggregate values on each and every client application  (web, mobile, etc).",
+  intro: (
+    <section>
+      <p>
+        Assume we need to create a realtime dashboard to show some summary
+        values. Usually, with Firebase, we'll have to get all data to the client
+        and process them there. But this can only work for small data sets. If
+        we have a few megabytes of data or more, this approach can get really
+        slow. And we must aggregate values on each and every client application
+        (web, mobile, etc).
+      </p>
+    </section>
+  ),
+  date: "2014-05-24",
+  tags: ["js", "firebase"],
+  layout: BlogPostLayout,
+};
+
+Assume we need to create a realtime dashboard to show some summary values. Usually, with Firebase, we'll have to get all data to the client and process them there. But this can only work for small data sets. If we have a few megabytes of data or more, this approach can get really slow. And we must aggregate values on each and every client application (web, mobile, etc).
+
+For this tutorial, both raw data and aggregated values will be stored in Firebase. As an example let's find the total number of data items per group (count) and sums of a few fields.
+
+To aggregate values, we'll write a simple application which runs on a server or a Node.js PaaS and automatically aggregates our data. To make things easier to use, we'll create a simple node module first. The module will update aggregation results when data is added or removed. The finished module will look like this.
+
+```js
+module.exports = function (opts) {
+  resetResults(function () {
+    opts.rawDataRef.on("child_added", function (snap) {
+      var data = snap.val();
+      var groupRef = getGroupRef(data);
+      groupRef.child("count").transaction(increment);
+      opts.fields.forEach(function (field) {
+        var value = data[field] || 0;
+        var totalRef = groupRef.child(field);
+        totalRef.transaction(function (total) {
+          return total + value;
+        });
+      });
+    });
+
+    opts.rawDataRef.on("child_removed", function (snap) {
+      var data = snap.val();
+      var groupRef = getGroupRef(data);
+      groupRef.child("count").transaction(decrement);
+      opts.fields.forEach(function (field) {
+        var value = data[field] || 0;
+        var totalRef = groupRef.child(field);
+        totalRef.transaction(function (total) {
+          return total - value;
+        });
+      });
+    });
+  });
+
+  function getGroupRef(data) {
+    var group = opts.groupFunction(data);
+    return opts.resultsRef.child(group);
+  }
+
+  function resetResults(callback) {
+    opts.resultsRef.set({}, callback);
+  }
+
+  function increment(value) {
+    return value + 1;
+  }
+
+  function decrement(value) {
+    return value - 1;
+  }
+};
+```
+
+It's not efficient to aggregate all data whenever something changes. For our luck, Firebase gives us 2 important events child_added and child_removed. This way, we can make the aggregation work almost realtime and also reduce response time, data transfer and Firebase API usage.
+
+First thing we need to do is reset data at resultsRef and listen to child_added and child_removed events. If we check the child_added event, first it updates the count and then finds the total for each field given by the user and finally it updates the resultsRef.
+
+Whenever we need to aggregate some data, we can require this module and use it. Here's an example which aggregates 2 fields and uses another field to group them.
+
+```js
+var Firebase = require("firebase");
+var FirebaseAggregator = require("./aggregator");
+var rootUrl = "https://aggregation-tutorial.firebaseio.com/";
+var rootRef = new Firebase(rootUrl);
+var rawDataRef = rootRef.child("rawData");
+var resultsRef = rootRef.child("results");
+
+FirebaseAggregator({
+  rawDataRef: rawDataRef,
+  resultsRef: resultsRef,
+  fields: ["valueA", "valueB"],
+  groupFunction: function (row) {
+    return row.group;
+  },
+});
+```
+
+The best thing about this approach is that we can run aggregation on aggregated values. We can even have multiple levels (e.g. daily, monthly, yearly) of aggregation. To test this out, create a Firebase account and deploying the aggregation app on your own server or someplace like Heroku.
