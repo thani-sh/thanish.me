@@ -8,6 +8,14 @@ export const config = {
   meta: {
     sitename: "Thanish.me",
     subtitle: "dd if=/dev/head of=/dev/blog",
+    repoLink: "https://github.com/thani-sh/thanish.me",
+    socialLinks: {
+      github: "https://github.com/thani-sh",
+      linkedin: "https://linkedin.com/in/thani-sh/",
+      twitter: "https://twitter.com/mnmtanish",
+      facebook: "https://facebook.com/mnmthanish/",
+      itchdotio: "https://thani-sh.itch.io/",
+    },
   },
 
   public: resolve(__dirname, "src/public"),

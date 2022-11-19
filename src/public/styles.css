@@ -1022,6 +1022,25 @@ iframe {
   padding: 64px 0;
 }
 
+.social-links {
+  text-align: center;
+}
+
+.button-link {
+  display: inline-block;
+  text-align: center;
+  background: #eee;
+  padding: 5px 10px;
+  border-radius: 10px;
+  text-decoration: none;
+}
+
+.button-link-code {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+}
+
 a.page-header-title {
   display: block;
   color: #24292e;
@@ -1041,7 +1060,7 @@ a.page-header-subtitle {
   font-size: 24px;
   line-height: 1;
   text-align: center;
-  margin-top: 12px;
+  margin: 12px 0;
 }
 
 a.page-header-subtitle:hover {

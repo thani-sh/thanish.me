@@ -50,7 +50,7 @@ async function buildMDX(srcFile, props = {}) {
     outdir: outDir,
   });
   const jsx = await import(tmpFile);
-  const meta = { ...config.meta, ...jsx.meta };
+  const meta = { ...config.meta, ...jsx.meta, link: dirname(srcFile) };
   await rm(tmpFile);
   const body = renderToStaticMarkup(
     React.createElement(meta.layout, {

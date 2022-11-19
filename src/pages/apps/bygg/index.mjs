@@ -10,7 +10,7 @@ document.body.innerHTML = `
   <a href="/" style="display: inline-block; text-align: center; background: #eee; padding: 5px 10px; border-radius: 10px; text-decoration: none; position: fixed; top: 10px; left: 10px;">
     <img src="/icons/googlehome.svg" width="16px" />
   </a>
-  <a href="/" style="display: inline-block; text-align: center; background: #eee; padding: 5px 10px; border-radius: 10px; text-decoration: none; position: fixed; top: 10px; right: 10px;">
+  <a href="https://github.com/thani-sh/thanish.me/tree/master/src/pages/apps/bygg" style="display: inline-block; text-align: center; background: #eee; padding: 5px 10px; border-radius: 10px; text-decoration: none; position: fixed; top: 10px; right: 10px;">
     <img src="/icons/github.svg" width="16px" />
   </a>
   <div id="wrapper" style="width: 450px; margin: 0 auto">
