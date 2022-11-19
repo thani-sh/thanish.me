@@ -42,7 +42,6 @@ async function buildMJS(srcFile) {
  * Parses given MDX file and returns HTML content and the path
  */
 async function buildMDX(srcFile, props = {}) {
-  console.log(srcFile);
   const outDir = join(config.dstDir, dirname(srcFile));
   const tmpFile = join(outDir, "index.js");
   await esbuild.build({
@@ -95,7 +94,7 @@ async function buildHomepage(pages) {
  * Returns an array of source file paths relative to `config.srcDir`
  */
 async function collectPages() {
-  return promisify(glob)("blog/**/*.{mdx,mjs}", { cwd: config.srcDir });
+  return promisify(glob)("{blog,apps}/**/*.{mdx,mjs}", { cwd: config.srcDir });
 }
 
 // ---

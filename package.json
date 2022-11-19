@@ -9,7 +9,7 @@
     "serve": "serve ./build",
     "lint": "prettier -w .src/**/*.{js,jsx,md,mdx}"
   },
-  "dependencies": {
+  "devDependencies": {
     "@mdx-js/esbuild": "^2.1.5",
     "@mdx-js/mdx": "^2.1.5",
     "esbuild": "^0.15.13",
