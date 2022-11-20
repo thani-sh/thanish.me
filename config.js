@@ -1,5 +1,6 @@
 import mdx from "@mdx-js/esbuild";
 import { resolve } from "node:path";
+import rehypeHighlight from "rehype-highlight";
 import { fileURLToPath } from "url";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
@@ -37,7 +38,11 @@ export const config = {
     bundle: true,
     format: "esm",
     external: ["react/*"],
-    plugins: [mdx({})],
+    plugins: [
+      mdx({
+        rehypePlugins: [rehypeHighlight],
+      }),
+    ],
     assetNames: "[hash]",
     loader: {
       ".png": "file",
