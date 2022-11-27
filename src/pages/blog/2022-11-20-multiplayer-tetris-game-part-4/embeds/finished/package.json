@@ -1,0 +1,14 @@
+{
+  "name": "@thani-sh/blog-2022-11-20-multiplayer-tetris-game-part-4",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "test:watch": "nodemon --exec 'npm run test' -w ./game",
+    "test": "node --loader tsx --test"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20",
+    "tsx": "^3.12.1"
+  }
+}

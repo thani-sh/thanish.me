@@ -70,7 +70,7 @@ async function buildMDX(srcFile, props = {}) {
  * Compiles given MDX file or JS file to an HTML file
  *  srcFile  Source file path relative to `config.srcDir` directory
  */
-async function buildFIle(srcFile) {
+async function buildFile(srcFile) {
   if (srcFile.endsWith(".mdx")) {
     return buildMDX(srcFile);
   }
@@ -94,7 +94,9 @@ async function buildHomepage(pages) {
  * Returns an array of source file paths relative to `config.srcDir`
  */
 async function collectPages() {
-  return promisify(glob)("{blog,apps}/**/*.{mdx,mjs}", { cwd: config.srcDir });
+  const pattern = "{blog,apps}/**/*.{mdx,mjs}";
+  const modules = await promisify(glob)(pattern, { cwd: config.srcDir });
+  return modules.filter((srcFile) => srcFile.indexOf("node_modules") === -1);
 }
 
 // ---
@@ -106,7 +108,7 @@ cp(config.public, config.dstDir, { recursive: true });
 // also collect blog post pages to build the homepage
 const pages = [];
 for (const srcFile of await collectPages()) {
-  const { type, html, path, meta } = await buildFIle(srcFile);
+  const { type, html, path, meta } = await buildFile(srcFile);
   await writeFile(path, html);
   if (type === "mdx") {
     pages.push({

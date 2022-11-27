@@ -1,0 +1,163 @@
+import { BlogPostLayout } from "../../../shared/templates-mdx/BlogPostLayout.jsx";
+import { GameIframe } from "./components/GameIframe";
+
+export const meta = {
+  title: "Multiplayer Tetris Game (part 4)",
+  description:
+    "This tutorial continues where we left off on part 3. We will add some tests to make sure the game is working as expected.",
+  intro: (
+    <section>
+      <p>
+        This tutorial continues where we left off on part 3. We will add some
+        tests to make sure the game is working as expected.
+      </p>
+      <p>
+        Did it work? you can try the updated game here (Instructions: click to
+        focus and use ↑←↓→ keys and WASD keys)
+      </p>
+      <GameIframe
+        src="/blog/2022-11-20-multiplayer-tetris-game-part-4/embeds/finished"
+        height="450px"
+      />
+    </section>
+  ),
+  date: "2022-11-20",
+  tags: ["js"],
+  layout: BlogPostLayout,
+};
+
+## Testing the game
+
+What do we need to test? and why?
+
+Each time we make changes to the game code, so far, we have been testing the game manually to make sure that
+the game has been working fine. This can be time consuming when the game becomes more and more complex. It is
+somewhat difficult to recreate certain scenarios in the game.
+
+Let's continue what we started on the previous blog post and write an ADR for the decision to write unit tests.
+
+```md
+# 03. Add unit tests
+
+Date: 2022-11-20
+
+## Status
+
+Accepted
+
+## Context
+
+The game is not completed. Several features, changes to existing features and bug fixes needs to be
+added. It takes significant effort to verify that all existing features are working as expected.
+
+## Decision
+
+- Add unit tests to verify that each component of the game are working as expected.
+- Use Node.js built-in test runner to run unit tests. This is because the the client has a requirement that we do not use any testing libraries.
+
+## Consequences
+
+- Additional effort needed to write and maintain unit tests
+- The game cost is written in Typescript. To import game code into test code, we need to use Custom ESM loaders, which is an experimental feature on NodeJS. This feature might change or get removed in the future.
+- The built-in test runner does not have the ability to create snapshot tests (eg: Jest). This could be useful when weriting integration tests.
+```
+
+Please note that because the game code is written in typescript, we need to use a loader to transpile typescript to javascript on the fly. Custom ESM loaders are an experimental feature and there's a chance this can change or removed in the future. After writing the ADR, using the built-in test runner no longer sound like a good idea. But let's imagine for some reasons we are required to avoid all testing libraries it.
+
+In the future, if someone reads the ADR, they can clearly see why we decided to go this way and that we made the decision fully aware of all the negative consequences of that decision.
+
+You can read more about how to write unit tests here: [https://nodejs.org/api/test.html](https://nodejs.org/api/test.html). And here are some example unit tests for one of the game world rules:
+
+**world_rule.test.js**
+
+```ts
+import * as assert from "node:assert";
+import { describe, it } from "node:test";
+import { ShapeActionName } from "../shape_action";
+import { WORLD_ACTION } from "../world_action";
+import { createWorldRules } from "../world_rule";
+import { createTestShape } from "./_test_utils";
+
+describe("World Rules", () => {
+  const [isBlockedFromLeft] = createWorldRules();
+
+  describe("isBlockedFromLeft", () => {
+    /**
+     * | A
+     * |AAA
+     * |
+     */
+    it("should block movements beyond the left edge of the game world", () => {
+      const shape = createTestShape({ posX: 0 });
+      const action = isBlockedFromLeft({
+        shape: shape,
+        sim: { ...shape, posX: shape.posX - 1 },
+        shapes: [[shape]],
+        action: ShapeActionName.MOVE_LEFT,
+      });
+      assert.equal(action, WORLD_ACTION.BLOCK_SHAPE_ACTION);
+    });
+
+    /**
+     * |   BB
+     * |   BB A
+     * |   BBAAA
+     * |
+     */
+    it("should block movements if there are other blocking shapes", () => {
+      const shapeA = createTestShape({ posX: 5, poxY: 5 });
+      const shapeB = createTestShape({
+        posX: 3,
+        posY: 4,
+        type: [
+          [1, 1],
+          [1, 1],
+          [1, 1],
+        ],
+      });
+      const action = isBlockedFromLeft({
+        shape: shapeA,
+        sim: { ...shapeA, posX: shapeA.posX - 1 },
+        shapes: [[shapeA, shapeB]],
+        action: ShapeActionName.MOVE_LEFT,
+      });
+      assert.equal(action, WORLD_ACTION.BLOCK_SHAPE_ACTION);
+    });
+
+    /**
+     * |   B
+     * |   BB A
+     * |   B AAA
+     * |
+     */
+    it("should block movements only if the filled blocks overlap", () => {
+      const shapeA = createTestShape({ posX: 5, poxY: 5 });
+      const shapeB = createTestShape({
+        posX: 3,
+        posY: 4,
+        type: [
+          [1, 0],
+          [1, 1],
+          [1, 0],
+        ],
+      });
+      const action = isBlockedFromLeft({
+        shape: shapeA,
+        sim: { ...shapeA, posX: shapeA.posX - 1 },
+        shapes: [[shapeA, shapeB]],
+        action: ShapeActionName.MOVE_LEFT,
+      });
+      assert.equal(action, null);
+    });
+  });
+});
+```
+
+You can run these tests using the built-in test runner for NodeJS. It will recursively search load files which match a given criteria such as the file name ending with `.test.js`. You can read more here: https://nodejs.org/api/test.html#test-runner-execution-model
+
+```shell
+npm install -D tsx
+node --loader tsx --test
+```
+
+Unit tests alone do not give us the full picture but it allows us to test edge cases with relatively low effort. We need a way to test the fully working game but let's try to do that in another blog post.

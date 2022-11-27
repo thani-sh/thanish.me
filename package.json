@@ -4,10 +4,12 @@
   "version": "2.0.0",
   "private": true,
   "scripts": {
-    "clean": "rm -rf build/*",
+    "build:watch": "nodemon --exec 'npm run build' -w ./src",
     "build": "npm run clean && node ./builder.js",
-    "serve": "serve ./build",
-    "lint": "prettier -w .src/**/*.{js,jsx,md,mdx}"
+    "clean": "rm -rf build/*",
+    "dev": "npm run build:watch & npm run serve",
+    "lint": "prettier -w .src/**/*.{js,jsx,md,mdx}",
+    "serve": "serve ./build"
   },
   "devDependencies": {
     "@mdx-js/esbuild": "^2.1.5",
@@ -15,6 +17,7 @@
     "esbuild": "^0.15.13",
     "glob": "^8.0.3",
     "handlebars": "^4.7.7",
+    "nodemon": "^2.0.20",
     "pixi.js": "^6.3.0",
     "prettier": "^2.7.1",
     "react": "^18.2.0",
