@@ -1,9 +1,8 @@
 import esbuild from "esbuild";
-import glob from "glob";
+import { glob } from "glob";
 import Handlebars from "handlebars";
 import { cp, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
-import { promisify } from "node:util";
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { config } from "./config.js";
@@ -95,7 +94,7 @@ async function buildHomepage(pages) {
  */
 async function collectPages() {
   const pattern = "{blog,apps}/**/*.{mdx,mjs}";
-  const modules = await promisify(glob)(pattern, { cwd: config.srcDir });
+  const modules = await glob(pattern, { cwd: config.srcDir });
   return modules.filter((srcFile) => srcFile.indexOf("node_modules") === -1);
 }
 
